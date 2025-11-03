@@ -19,6 +19,7 @@ export function CropDataTable({ metrics }: CropDataTableProps) {
         <TableHeader className="bg-muted/60">
           <TableRow>
             <TableHead>Field block</TableHead>
+            <TableHead>Barangay</TableHead>
             <TableHead>Area (ha)</TableHead>
             <TableHead>Yield (t/ha)</TableHead>
             <TableHead>Soil moisture</TableHead>
@@ -31,6 +32,7 @@ export function CropDataTable({ metrics }: CropDataTableProps) {
               <TableCell className="font-medium text-foreground">
                 {row.name}
               </TableCell>
+              <TableCell>{row.barangay}</TableCell>
               <TableCell>{row.area.toFixed(0)}</TableCell>
               <TableCell>{row.yield.toFixed(1)}</TableCell>
               <TableCell>{(row.moisture * 100).toFixed(0)}%</TableCell>

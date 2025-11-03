@@ -1,15 +1,16 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Satellite, Waves, Sparkle } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { CropMetrics } from "@/lib/crop-data";
+import type { CropMetrics, CropSlug } from "@/lib/crop-data";
 
+import { CropMap } from "./crop-map";
 import { MiniChartCard } from "./mini-chart-card";
-import { MapPlaceholder } from "./map-placeholder";
 
 interface LandingDashboardProps {
   corn: CropMetrics;
@@ -35,6 +36,16 @@ const heroMetrics = [
 ];
 
 export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
+  const [activeCrop, setActiveCrop] = useState<CropSlug>("corn");
+
+  const activeMetrics = activeCrop === "corn" ? corn : onion;
+
+  const colorStops = useMemo(() => {
+    return activeCrop === "corn"
+      ? ["#e0f2fe", "#bae6fd", "#7dd3fc", "#38bdf8", "#0ea5e9"]
+      : ["#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc", "#a855f7"];
+  }, [activeCrop]);
+
   return (
     <div className="space-y-10">
       <section className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background via-background to-muted/50 p-8 text-foreground shadow-sm sm:p-12">
@@ -147,7 +158,37 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
             </div>
           </CardContent>
         </Card>
-        <MapPlaceholder />
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground/80">
+              Timelapse preview
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant={activeCrop === "corn" ? "accent" : "outline"}
+                size="sm"
+                className="rounded-full text-xs"
+                onClick={() => setActiveCrop("corn")}
+              >
+                Corn
+              </Button>
+              <Button
+                variant={activeCrop === "onion" ? "accent" : "outline"}
+                size="sm"
+                className="rounded-full text-xs"
+                onClick={() => setActiveCrop("onion")}
+              >
+                Onion
+              </Button>
+            </div>
+          </div>
+          <CropMap
+            cropName={activeCrop === "corn" ? "Corn" : "Onion"}
+            features={activeMetrics.features}
+            timelineMonths={activeMetrics.timelineMonths}
+            colorStops={colorStops}
+          />
+        </div>
       </section>
     </div>
   );

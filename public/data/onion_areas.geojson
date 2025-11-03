@@ -10,7 +10,15 @@
         "yield_t_per_ha": 4.1,
         "area_ha": 64,
         "soil_moisture": 0.54,
-        "ndvi": 0.63
+        "ndvi": 0.63,
+        "barangay": "San Verde",
+        "monthly_production": {
+          "2024-04": 310,
+          "2024-05": 345,
+          "2024-06": 372,
+          "2024-07": 388,
+          "2024-08": 395
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -33,7 +41,15 @@
         "yield_t_per_ha": 4.6,
         "area_ha": 72,
         "soil_moisture": 0.59,
-        "ndvi": 0.67
+        "ndvi": 0.67,
+        "barangay": "Barangay del Rio",
+        "monthly_production": {
+          "2024-04": 335,
+          "2024-05": 365,
+          "2024-06": 402,
+          "2024-07": 418,
+          "2024-08": 430
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -56,7 +72,15 @@
         "yield_t_per_ha": 3.8,
         "area_ha": 58,
         "soil_moisture": 0.5,
-        "ndvi": 0.6
+        "ndvi": 0.6,
+        "barangay": "Santa Mesa",
+        "monthly_production": {
+          "2024-04": 280,
+          "2024-05": 305,
+          "2024-06": 330,
+          "2024-07": 346,
+          "2024-08": 352
+        }
       },
       "geometry": {
         "type": "Polygon",

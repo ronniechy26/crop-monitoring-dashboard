@@ -10,7 +10,15 @@
         "yield_t_per_ha": 8.4,
         "area_ha": 124,
         "soil_moisture": 0.68,
-        "ndvi": 0.74
+        "ndvi": 0.74,
+        "barangay": "San Prairie",
+        "monthly_production": {
+          "2024-04": 920,
+          "2024-05": 1010,
+          "2024-06": 1125,
+          "2024-07": 1180,
+          "2024-08": 1235
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -33,7 +41,15 @@
         "yield_t_per_ha": 7.9,
         "area_ha": 118,
         "soil_moisture": 0.61,
-        "ndvi": 0.7
+        "ndvi": 0.7,
+        "barangay": "Santa Aurora",
+        "monthly_production": {
+          "2024-04": 860,
+          "2024-05": 940,
+          "2024-06": 1015,
+          "2024-07": 1090,
+          "2024-08": 1115
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -56,7 +72,15 @@
         "yield_t_per_ha": 9.2,
         "area_ha": 132,
         "soil_moisture": 0.72,
-        "ndvi": 0.78
+        "ndvi": 0.78,
+        "barangay": "Nueva Luz",
+        "monthly_production": {
+          "2024-04": 980,
+          "2024-05": 1075,
+          "2024-06": 1170,
+          "2024-07": 1240,
+          "2024-08": 1325
+        }
       },
       "geometry": {
         "type": "Polygon",

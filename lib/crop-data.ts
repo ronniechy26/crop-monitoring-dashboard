@@ -10,6 +10,8 @@ export interface CropFeatureProperties {
   area_ha: number;
   soil_moisture: number;
   ndvi: number;
+  barangay: string;
+  monthly_production: Record<string, number>;
 }
 
 export interface CropFeature {
@@ -55,10 +57,20 @@ export interface CropMetrics {
   table: Array<{
     id: string;
     name: string;
+    barangay: string;
     area: number;
     yield: number;
     moisture: number;
     ndvi: number;
+  }>;
+  features: CropFeature[];
+  timelineMonths: string[];
+  barangayProduction: Array<{
+    barangay: string;
+    totalArea: number;
+    latestProduction: number;
+    averageYield: number;
+    monthly: Record<string, number>;
   }>;
 }
 
@@ -137,6 +149,7 @@ function buildTableData(geoJson: CropGeoJson) {
   return geoJson.features.map((feature) => ({
     id: feature.id,
     name: feature.properties.name,
+    barangay: feature.properties.barangay,
     area: feature.properties.area_ha,
     yield: feature.properties.yield_t_per_ha,
     moisture: feature.properties.soil_moisture,
@@ -144,13 +157,76 @@ function buildTableData(geoJson: CropGeoJson) {
   }));
 }
 
+function collectTimelineMonths(geoJson: CropGeoJson) {
+  const monthsSet = new Set<string>();
+  geoJson.features.forEach((feature) => {
+    Object.keys(feature.properties.monthly_production).forEach((month) => {
+      monthsSet.add(month);
+    });
+  });
+  return Array.from(monthsSet).sort();
+}
+
+function aggregateBarangayProduction(geoJson: CropGeoJson) {
+  const barangayMap = new Map<
+    string,
+    {
+      totalArea: number;
+      totalYield: number;
+      featureCount: number;
+      monthly: Record<string, number>;
+    }
+  >();
+
+  geoJson.features.forEach((feature) => {
+    const key = feature.properties.barangay;
+    if (!barangayMap.has(key)) {
+      barangayMap.set(key, {
+        totalArea: 0,
+        totalYield: 0,
+        featureCount: 0,
+        monthly: {},
+      });
+    }
+    const entry = barangayMap.get(key)!;
+    entry.totalArea += feature.properties.area_ha;
+    entry.totalYield += feature.properties.yield_t_per_ha;
+    entry.featureCount += 1;
+    Object.entries(feature.properties.monthly_production).forEach(
+      ([month, value]) => {
+        entry.monthly[month] = (entry.monthly[month] ?? 0) + value;
+      },
+    );
+  });
+
+  return Array.from(barangayMap.entries()).map(([barangay, stats]) => {
+    const sortedMonths = Object.keys(stats.monthly).sort();
+    const latestMonth = sortedMonths.length > 0 ? sortedMonths[sortedMonths.length - 1] : "";
+    return {
+      barangay,
+      totalArea: Number(stats.totalArea.toFixed(1)),
+      averageYield: Number(
+        (stats.totalYield / Math.max(stats.featureCount, 1)).toFixed(1),
+      ),
+      latestProduction: latestMonth
+        ? Number((stats.monthly[latestMonth] ?? 0).toFixed(0))
+        : 0,
+      monthly: stats.monthly,
+    };
+  });
+}
+
 export const getCropMetrics = cache(async (crop: CropSlug): Promise<CropMetrics> => {
   const geoJson = await getCropGeoJson(crop);
+  const timelineMonths = collectTimelineMonths(geoJson);
   return {
     summary: summarizeFeatures(crop, geoJson),
     trend: mockTrends[crop],
     timeSeries: mockTimeSeries[crop],
     table: buildTableData(geoJson),
+    features: geoJson.features,
+    timelineMonths,
+    barangayProduction: aggregateBarangayProduction(geoJson),
   };
 });
 
