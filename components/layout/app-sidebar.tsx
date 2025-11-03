@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 const navItems = [
   {
@@ -65,7 +66,12 @@ export function AppSidebar({
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-chart-1 to-chart-3 shadow-inner" />
+          <Image 
+            src="/crop-logo.png"
+            alt="Crop Monitor Logo"
+            width={collapsed ? 50 : 60}
+            height={collapsed ? 50 : 60}
+          />
           <div
             className={cn(
               "transition-opacity duration-200",
