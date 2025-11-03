@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "name": "Onion Growth Areas",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "onion-1",
+      "properties": {
+        "name": "Green Hollow",
+        "yield_t_per_ha": 4.1,
+        "area_ha": 64,
+        "soil_moisture": 0.54,
+        "ndvi": 0.63
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-118.305, 34.066],
+            [-118.295, 34.066],
+            [-118.295, 34.056],
+            [-118.305, 34.056],
+            [-118.305, 34.066]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "onion-2",
+      "properties": {
+        "name": "Valley Crest",
+        "yield_t_per_ha": 4.6,
+        "area_ha": 72,
+        "soil_moisture": 0.59,
+        "ndvi": 0.67
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-118.281, 34.048],
+            [-118.271, 34.048],
+            [-118.271, 34.038],
+            [-118.281, 34.038],
+            [-118.281, 34.048]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "onion-3",
+      "properties": {
+        "name": "Desert Bloom",
+        "yield_t_per_ha": 3.8,
+        "area_ha": 58,
+        "soil_moisture": 0.5,
+        "ndvi": 0.6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-118.291, 34.032],
+            [-118.281, 34.032],
+            [-118.281, 34.022],
+            [-118.291, 34.022],
+            [-118.291, 34.032]
+          ]
+        ]
+      }
+    }
+  ]
+}

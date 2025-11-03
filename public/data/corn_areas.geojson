@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "name": "Corn Growth Areas",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "corn-1",
+      "properties": {
+        "name": "Prairie North",
+        "yield_t_per_ha": 8.4,
+        "area_ha": 124,
+        "soil_moisture": 0.68,
+        "ndvi": 0.74
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-93.251, 45.112],
+            [-93.241, 45.112],
+            [-93.241, 45.102],
+            [-93.251, 45.102],
+            [-93.251, 45.112]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corn-2",
+      "properties": {
+        "name": "River Bend",
+        "yield_t_per_ha": 7.9,
+        "area_ha": 118,
+        "soil_moisture": 0.61,
+        "ndvi": 0.7
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-93.215, 45.096],
+            [-93.205, 45.096],
+            [-93.205, 45.086],
+            [-93.215, 45.086],
+            [-93.215, 45.096]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corn-3",
+      "properties": {
+        "name": "Sunset Valley",
+        "yield_t_per_ha": 9.2,
+        "area_ha": 132,
+        "soil_moisture": 0.72,
+        "ndvi": 0.78
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-93.267, 45.082],
+            [-93.257, 45.082],
+            [-93.257, 45.072],
+            [-93.267, 45.072],
+            [-93.267, 45.082]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CalendarDays,
+  Filter,
+  Menu,
+  Bell,
+  Sparkles,
+  X,
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const pageMeta: Record<
+  string,
+  { title: string; subtitle: string; accent: string }
+> = {
+  "/": {
+    title: "Field Overview",
+    subtitle: "Real-time satellite & sensor snapshots",
+    accent: "Corn & Onion",
+  },
+  "/corn": {
+    title: "Corn Pulse",
+    subtitle: "Growth-stage insights & yield signals",
+    accent: "V10 Growth Phase",
+  },
+  "/onion": {
+    title: "Onion Health",
+    subtitle: "Irrigation balance & disease watch",
+    accent: "Phase 2 Bulbing",
+  },
+};
+
+const seasons = ["2024", "2023", "2022"];
+const metrics = ["Yield", "NDVI", "Soil Moisture"];
+
+export function TopNav() {
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [seasonIndex, setSeasonIndex] = useState(0);
+  const [metricIndex, setMetricIndex] = useState(0);
+
+  const page = useMemo(() => {
+    return pageMeta[pathname ?? "/"] ?? pageMeta["/"];
+  }, [pathname]);
+
+  return (
+    <>
+      <header className="sticky top-0 z-50 flex items-center justify-between rounded-2xl border border-border/60 bg-background/80 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-semibold text-foreground">
+                {page.title}
+              </h1>
+              <Badge variant="success">{page.accent}</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{page.subtitle}</p>
+          </div>
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5">
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground/80">
+              {seasons[seasonIndex]} Season
+            </span>
+          </div>
+          <Button
+            variant="subtle"
+            size="sm"
+            className="rounded-full"
+            onClick={() =>
+              setSeasonIndex((index) => (index + 1) % seasons.length)
+            }
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            Season
+          </Button>
+          <Button
+            variant="subtle"
+            size="sm"
+            className="rounded-full"
+            onClick={() =>
+              setMetricIndex((index) => (index + 1) % metrics.length)
+            }
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Focus {metrics[metricIndex]}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full border border-border/60"
+            aria-label="Notifications"
+          >
+            <Bell className="h-4 w-4" />
+          </Button>
+          <Avatar initials="AG" />
+        </div>
+      </header>
+
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/60 backdrop-blur-sm lg:hidden"
+          >
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 240, damping: 28 }}
+              className="absolute left-4 right-14 top-6"
+            >
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute -right-3 -top-3 h-8 w-8 rounded-full border border-border/60 bg-background"
+                  onClick={() => setSidebarOpen(false)}
+                  aria-label="Close navigation menu"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <AppSidebar onNavigate={() => setSidebarOpen(false)} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
