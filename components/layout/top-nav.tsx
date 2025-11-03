@@ -2,18 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  CalendarDays,
-  Filter,
-  Menu,
-  Bell,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { CalendarDays, Filter, Menu, Sparkles, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { AppSidebar } from "@/components/layout/app-sidebar";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -104,15 +96,6 @@ export function TopNav() {
             <Sparkles className="mr-2 h-4 w-4" />
             Focus {metrics[metricIndex]}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full border border-border/60"
-            aria-label="Notifications"
-          >
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Avatar initials="AG" />
         </div>
       </header>
 

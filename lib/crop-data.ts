@@ -238,11 +238,3 @@ export async function getAllCropSummaries() {
 
   return [corn.summary, onion.summary];
 }
-
-export function formatPercentage(value: number) {
-  return `${(value * 100).toFixed(0)}%`;
-}
-
-export function formatYield(value: number) {
-  return `${value.toFixed(1)} t/ha`;
-}

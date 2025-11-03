@@ -16,6 +16,7 @@ export interface LeafletChoroplethProps {
   colorStops: string[];
   min: number;
   max: number;
+  height?: number;
 }
 
 function getColorScale(value: number, min: number, max: number, palette: string[]) {
@@ -37,6 +38,7 @@ export function LeafletChoropleth({
   colorStops,
   min,
   max,
+  height,
 }: LeafletChoroplethProps) {
   const geoJsonData = useMemo<FeatureCollection>(() => {
     return {
@@ -49,9 +51,13 @@ export function LeafletChoropleth({
     <MapContainer
       center={center}
       bounds={bounds}
-      scrollWheelZoom={false}
-      style={{ height: 360, width: "100%" }}
-      className="[&_.leaflet-control-container]:hidden"
+      zoom={6}
+      minZoom={5}
+      maxZoom={12}
+      scrollWheelZoom
+      doubleClickZoom
+      style={{ height: height ?? 360, width: "100%" }}
+      className="rounded-2xl [&_.leaflet-control-container]:!block [&_.leaflet-bottom.leaflet-right]:m-4 [&_.leaflet-control-zoom]:rounded-xl [&_.leaflet-control-zoom a]:!bg-background [&_.leaflet-control-zoom a]:!text-foreground [&_.leaflet-control-zoom a]:!border [&_.leaflet-control-zoom a]:!border-border/70 [&_.leaflet-control-zoom a]:hover:!bg-muted"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

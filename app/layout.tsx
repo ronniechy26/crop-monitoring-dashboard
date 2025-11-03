@@ -33,11 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} bg-muted/40 antialiased`}
       >
         <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/60">
-          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-6 lg:flex-row lg:px-8">
+          <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:px-8 2xl:px-12">
             <div className="hidden w-[260px] lg:block">
               <AppSidebar />
             </div>
-            <div className="flex-1 space-y-6 lg:pl-2">
+            <div className="flex-1 space-y-6 lg:pl-4 2xl:pl-6">
               <TopNav />
               <main className="pb-16">{children}</main>
             </div>

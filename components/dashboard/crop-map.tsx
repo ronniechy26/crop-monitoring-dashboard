@@ -24,6 +24,7 @@ interface CropMapProps {
   features: CropFeature[];
   timelineMonths: string[];
   colorStops: string[];
+  height?: number;
 }
 
 const playbackIntervalMs = 2200;
@@ -87,6 +88,7 @@ export function CropMap({
   features,
   timelineMonths,
   colorStops,
+  height,
 }: CropMapProps) {
   const [monthIndex, setMonthIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -226,6 +228,7 @@ export function CropMap({
             colorStops={colorStops}
             min={monthStats.min}
             max={monthStats.max}
+            height={height}
           />
         </div>
       </CardContent>
