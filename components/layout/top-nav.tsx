@@ -2,12 +2,21 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, Filter, Menu, Sparkles, X } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Menu,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const pageMeta: Record<
   string,
@@ -33,7 +42,15 @@ const pageMeta: Record<
 const seasons = ["2024", "2023", "2022"];
 const metrics = ["Yield", "NDVI", "Soil Moisture"];
 
-export function TopNav() {
+interface TopNavProps {
+  onToggleSidebar?: () => void;
+  sidebarCollapsed?: boolean;
+}
+
+export function TopNav({
+  onToggleSidebar,
+  sidebarCollapsed = false,
+}: TopNavProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [seasonIndex, setSeasonIndex] = useState(0);
@@ -56,6 +73,24 @@ export function TopNav() {
           >
             <Menu className="h-5 w-5" />
           </Button>
+          {onToggleSidebar ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "hidden h-10 w-10 rounded-full border border-border/60 bg-muted/40 hover:bg-muted/60 lg:inline-flex",
+                sidebarCollapsed && "bg-muted/60",
+              )}
+              onClick={onToggleSidebar}
+              aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+              )}
+            </Button>
+          ) : null}
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base font-semibold text-foreground">

@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import type { LatLngBoundsExpression } from "leaflet";
 import type { FeatureCollection } from "geojson";
 import "leaflet/dist/leaflet.css";
-
 import type { CropFeature, CropFeatureProperties } from "@/lib/crop-data";
 
 export interface LeafletChoroplethProps {
@@ -23,14 +22,11 @@ function getColorScale(value: number, min: number, max: number, palette: string[
   if (!Number.isFinite(value)) return palette[0] ?? "#0f172a";
   if (max === min) return palette[Math.floor(palette.length / 2)] ?? palette[0];
   const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
-  const index = Math.min(
-    palette.length - 1,
-    Math.floor(ratio * (palette.length - 1)),
-  );
+  const index = Math.min(palette.length - 1, Math.floor(ratio * (palette.length - 1)));
   return palette[index];
 }
 
-export function LeafletChoropleth({
+function LeafletChoroplethComponent({
   features,
   bounds,
   center,
@@ -40,12 +36,14 @@ export function LeafletChoropleth({
   max,
   height,
 }: LeafletChoroplethProps) {
-  const geoJsonData = useMemo<FeatureCollection>(() => {
-    return {
-      type: "FeatureCollection",
-      features,
-    };
-  }, [features]);
+
+  const geoJsonData = useMemo<FeatureCollection>(
+    () => ({ type: "FeatureCollection", features }),
+    [features]
+  );
+
+  // ✅ Optional extra guard for cached components
+  if (typeof window === "undefined") return null;
 
   return (
     <MapContainer
@@ -67,10 +65,8 @@ export function LeafletChoropleth({
         key={monthKey}
         data={geoJsonData}
         style={(feature) => {
-          const properties = (feature?.properties ??
-            {}) as CropFeatureProperties;
-          const production =
-            properties.monthly_production?.[monthKey] ?? 0;
+          const props = (feature?.properties ?? {}) as CropFeatureProperties;
+          const production = props.monthly_production?.[monthKey] ?? 0;
           const fillColor = getColorScale(production, min, max, colorStops);
           return {
             color: "rgba(15, 23, 42, 0.45)",
@@ -80,14 +76,12 @@ export function LeafletChoropleth({
           };
         }}
         onEachFeature={(feature, layer) => {
-          const properties = (feature?.properties ??
-            {}) as CropFeatureProperties;
-          const production =
-            properties.monthly_production?.[monthKey] ?? 0;
-          const barangay = properties.barangay ?? "Barangay";
-          const name = properties.name ?? "Field";
+          const props = (feature?.properties ?? {}) as CropFeatureProperties;
+          const production = props.monthly_production?.[monthKey] ?? 0;
+          const barangay = props.barangay ?? "Barangay";
+          const name = props.name ?? "Field";
           layer.bindTooltip(
-            `<strong>${barangay}</strong><br/>${name}<br/>${production.toLocaleString()} tons`,
+            `<strong>${barangay}</strong><br/>${name}<br/>${production.toLocaleString()} tons`
           );
         }}
       />
@@ -95,4 +89,6 @@ export function LeafletChoropleth({
   );
 }
 
+export const LeafletChoropleth = memo(LeafletChoroplethComponent);
+LeafletChoropleth.displayName = "LeafletChoropleth";
 export default LeafletChoropleth;

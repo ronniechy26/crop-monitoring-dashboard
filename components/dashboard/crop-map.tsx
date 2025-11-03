@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { LatLngBoundsExpression } from "leaflet";
 import { motion } from "framer-motion";
@@ -77,13 +77,14 @@ function computeCenter(features: CropFeature[]): [number, number] {
   return [totalLat / count, totalLng / count];
 }
 
-const LeafletChoropleth = dynamic<LeafletChoroplethProps>(
-  () =>
-    import("./leaflet-choropleth").then((mod) => mod.LeafletChoropleth),
-  { ssr: false },
+const LeafletChoropleth = dynamic(
+  () => import("@/components/dashboard/leaflet-choropleth"),
+  {
+    ssr: false,
+    loading: () => <div className="h-[360px] w-full bg-muted rounded-2xl" />, 
+  }
 );
-
-export function CropMap({
+function CropMapComponent({
   cropName,
   features,
   timelineMonths,
@@ -235,3 +236,6 @@ export function CropMap({
     </Card>
   );
 }
+
+export const CropMap = memo(CropMapComponent);
+CropMap.displayName = "CropMap";

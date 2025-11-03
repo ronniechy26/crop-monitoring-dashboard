@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { ArrowRight, MapPin } from "lucide-react";
 import Link from "next/link";
 
@@ -231,13 +231,6 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
             </Button>
           </div>
         </div>
-        <CropMap
-          cropName={activeCrop === "corn" ? "Corn" : "Onion"}
-          features={activeMetrics.features}
-          timelineMonths={activeMetrics.timelineMonths}
-          colorStops={colorStops}
-          height={780}
-        />
         <Card className="border-border/60 bg-card/95 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">

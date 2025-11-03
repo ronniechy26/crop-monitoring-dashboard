@@ -1,13 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  LayoutDashboard,
-  Sprout,
-  Carrot,
-  Globe2,
-  Settings,
-} from "lucide-react";
+import { LayoutDashboard, Sprout, Carrot, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -37,11 +31,6 @@ const navItems = [
 
 const secondaryItems = [
   {
-    label: "Global layers soon",
-    icon: Globe2,
-    href: "#",
-  },
-  {
     label: "Settings",
     icon: Settings,
     href: "#",
@@ -51,22 +40,38 @@ const secondaryItems = [
 interface AppSidebarProps {
   className?: string;
   onNavigate?: () => void;
+  collapsed?: boolean;
 }
 
-export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
+export function AppSidebar({
+  className,
+  onNavigate,
+  collapsed = false,
+}: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
     <aside
       className={cn(
-        "group flex w-full max-w-[260px] flex-col overflow-hidden rounded-2xl border border-border/60 bg-sidebar/70 backdrop-blur supports-[backdrop-filter]:bg-sidebar/50",
+        "group flex w-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-sidebar/70 backdrop-blur supports-[backdrop-filter]:bg-sidebar/50 transition-colors",
+        collapsed ? "max-w-[88px] px-2" : "max-w-[260px] px-0",
         className,
       )}
     >
-      <div className="flex items-center justify-between px-5 pb-6 pt-6">
+      <div
+        className={cn(
+          "flex items-center justify-between pb-6 pt-6",
+          collapsed ? "px-2" : "px-5",
+        )}
+      >
         <div className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-chart-1 to-chart-3 shadow-inner" />
-          <div>
+          <div
+            className={cn(
+              "transition-opacity duration-200",
+              collapsed ? "opacity-0 pointer-events-none hidden" : "opacity-100",
+            )}
+          >
             <p className="text-sm font-semibold text-sidebar-foreground">
               Crop Monitor
             </p>
@@ -75,10 +80,15 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
             </p>
           </div>
         </div>
-        <Badge variant="accent">Live</Badge>
+        {!collapsed ? <Badge variant="accent">Live</Badge> : null}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-4 px-3 pb-4">
+      <nav
+        className={cn(
+          "flex flex-1 flex-col gap-4 pb-4",
+          collapsed ? "px-1" : "px-3",
+        )}
+      >
         <div className="flex flex-col gap-2">
           {navItems.map((item) => {
             const isActive =
@@ -93,6 +103,7 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
                 className={cn(
                   "relative flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-sm transition-all hover:border-border/60 hover:bg-sidebar-accent/60 hover:text-foreground",
                   isActive && "text-sidebar-primary-foreground",
+                  collapsed && "justify-center px-2",
                 )}
               >
                 <Icon
@@ -101,12 +112,14 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
                     isActive && "text-sidebar-primary",
                   )}
                 />
-                <div className="flex flex-1 flex-col leading-tight">
-                  <span className="font-semibold">{item.label}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {item.description}
-                  </span>
-                </div>
+                {!collapsed ? (
+                  <div className="flex flex-1 flex-col leading-tight">
+                    <span className="font-semibold">{item.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {item.description}
+                    </span>
+                  </div>
+                ) : null}
                 {isActive && (
                   <motion.span
                     layoutId="sidebar-active-pill"
@@ -119,17 +132,12 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
           })}
         </div>
 
-        <div className="mt-auto rounded-xl border border-dashed border-border/60 bg-muted/40 p-4 text-xs text-muted-foreground">
-          <p className="font-semibold text-foreground/80">
-            Leaflet Layers
-          </p>
-          <p className="mt-1 leading-relaxed">
-            Map overlays are in progress. Drop your geo layers here to preview
-            soil and canopy health soon.
-          </p>
-        </div>
-
-        <div className="space-y-2 border-t border-border/60 pt-4 text-xs">
+        <div
+          className={cn(
+            "mt-auto space-y-2 border-t border-border/60 pt-4 text-xs transition-opacity duration-200",
+            collapsed ? "opacity-0 pointer-events-none" : "opacity-100",
+          )}
+        >
           {secondaryItems.map((item) => {
             const Icon = item.icon;
             return (

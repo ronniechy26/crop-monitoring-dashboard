@@ -1,6 +1,7 @@
 import { cache } from "react";
-import { promises as fs } from "fs";
-import path from "path";
+
+import cornData from "@/data/corn_areas.json";
+import onionData from "@/data/onion_areas.json";
 
 export type CropSlug = "corn" | "onion";
 
@@ -74,9 +75,9 @@ export interface CropMetrics {
   }>;
 }
 
-const cropFileMap: Record<CropSlug, string> = {
-  corn: "corn_areas.geojson",
-  onion: "onion_areas.geojson",
+const cropDataMap: Record<CropSlug, CropGeoJson> = {
+  corn: cornData as CropGeoJson,
+  onion: onionData as CropGeoJson,
 };
 
 const mockTrends: Record<CropSlug, CropMetrics["trend"]> = {
@@ -112,14 +113,7 @@ const mockTimeSeries: Record<CropSlug, TimeseriesPoint[]> = {
 };
 
 export const getCropGeoJson = cache(async (crop: CropSlug) => {
-  const filePath = path.join(
-    process.cwd(),
-    "public",
-    "data",
-    cropFileMap[crop],
-  );
-  const file = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(file) as CropGeoJson;
+  return cropDataMap[crop];
 });
 
 function summarizeFeatures(crop: CropSlug, geoJson: CropGeoJson): CropSummary {

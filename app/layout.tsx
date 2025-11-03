@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { TopNav } from "@/components/layout/top-nav";
+import { AppShell } from "@/components/layout/app-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Crop Monitoring Dashboard",
   description:
-    "Next-gen crop telemetry for row crops and vegetables, built with Next.js, Recharts, and shadcn/ui.",
+    "Next-gen crop telemetry for row crops and vegetables!",
 };
 
 export default function RootLayout({
@@ -32,17 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-muted/40 antialiased`}
       >
-        <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/60">
-          <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:px-8 2xl:px-12">
-            <div className="hidden w-[260px] lg:block">
-              <AppSidebar />
-            </div>
-            <div className="flex-1 space-y-6 lg:pl-4 2xl:pl-6">
-              <TopNav />
-              <main className="pb-16">{children}</main>
-            </div>
-          </div>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
