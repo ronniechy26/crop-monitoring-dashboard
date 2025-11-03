@@ -4,7 +4,7 @@ const themeBootstrapScript = `
     const storedMode = localStorage.getItem('cmd-theme-mode') || 'system';
     const storedPalette = localStorage.getItem('cmd-theme-palette') || 'classic';
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const navPlacement = localStorage.getItem('cmd-sidebar-position') || 'sidebar';
+    const navPlacement = localStorage.getItem('cmd-sidebar-position') || 'navbar';
     const finalMode = storedMode === 'system' ? (prefersDark ? 'dark' : 'light') : storedMode;
     const root = document.documentElement;
     root.classList.toggle('dark', finalMode === 'dark');

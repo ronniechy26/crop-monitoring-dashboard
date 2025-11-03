@@ -61,10 +61,10 @@ const getStoredPalette = (): ThemePalette => {
 };
 
 const getStoredSidebarPosition = (): SidebarPosition => {
-  if (typeof window === "undefined") return "sidebar";
+  if (typeof window === "undefined") return "navbar";
   return (
     (window.localStorage.getItem(SIDEBAR_POSITION_KEY) as SidebarPosition | null) ??
-    "sidebar"
+    "navbar"
   );
 };
 
@@ -133,7 +133,7 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mode, setModeState] = useState<ThemeMode>("system");
   const [palette, setPaletteState] = useState<ThemePalette>("classic");
-  const [sidebarPosition, setSidebarPositionState] = useState<SidebarPosition>("sidebar");
+  const [sidebarPosition, setSidebarPositionState] = useState<SidebarPosition>("navbar");
   const systemPreference = useSystemColorScheme();
   const resolvedMode = mode === "system" ? systemPreference : mode;
 
