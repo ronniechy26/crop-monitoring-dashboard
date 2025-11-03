@@ -9,6 +9,8 @@ const themeBootstrapScript = `
     const root = document.documentElement;
     root.classList.toggle('dark', finalMode === 'dark');
     root.dataset.theme = storedPalette;
+    root.dataset.themeMode = storedMode;
+    root.dataset.themeResolved = finalMode;
     root.dataset.navigation = navPlacement;
     root.style.colorScheme = finalMode === 'dark' ? 'dark' : 'light';
   } catch (error) {
@@ -26,6 +28,7 @@ const themeMediaSyncScript = `
       if (storedMode === 'system') {
         document.documentElement.classList.toggle('dark', event.matches);
         document.documentElement.style.colorScheme = event.matches ? 'dark' : 'light';
+        document.documentElement.dataset.themeResolved = event.matches ? 'dark' : 'light';
       }
     });
   } catch (error) {

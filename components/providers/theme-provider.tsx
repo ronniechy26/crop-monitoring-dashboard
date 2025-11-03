@@ -5,10 +5,10 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
   useSyncExternalStore,
-  useTransition,
   type ReactNode,
 } from "react";
 
@@ -42,6 +42,9 @@ const SIDEBAR_POSITION_KEY = "cmd-sidebar-position";
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 const getStoredMode = (): ThemeMode => {
   if (typeof window === "undefined") return "system";
   return (
@@ -63,6 +66,42 @@ const getStoredSidebarPosition = (): SidebarPosition => {
     (window.localStorage.getItem(SIDEBAR_POSITION_KEY) as SidebarPosition | null) ??
     "sidebar"
   );
+};
+
+const isThemeMode = (value: string | undefined): value is ThemeMode =>
+  value === "light" || value === "dark" || value === "system";
+
+const isSidebarPosition = (value: string | undefined): value is SidebarPosition =>
+  value === "sidebar" || value === "navbar";
+
+const isThemePalette = (value: string | undefined): value is ThemePalette =>
+  themePalettes.some((palette) => palette.value === value);
+
+const getDomMode = (): ThemeMode => {
+  if (typeof document === "undefined") return getStoredMode();
+  const { themeMode } = document.documentElement.dataset;
+  if (isThemeMode(themeMode)) {
+    return themeMode;
+  }
+  return getStoredMode();
+};
+
+const getDomPalette = (): ThemePalette => {
+  if (typeof document === "undefined") return getStoredPalette();
+  const palette = document.documentElement.dataset.theme;
+  if (isThemePalette(palette)) {
+    return palette;
+  }
+  return getStoredPalette();
+};
+
+const getDomSidebarPosition = (): SidebarPosition => {
+  if (typeof document === "undefined") return getStoredSidebarPosition();
+  const navigation = document.documentElement.dataset.navigation;
+  if (isSidebarPosition(navigation)) {
+    return navigation;
+  }
+  return getStoredSidebarPosition();
 };
 
 function useSystemColorScheme(): "light" | "dark" {
@@ -95,30 +134,32 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mode, setModeState] = useState<ThemeMode>("system");
   const [palette, setPaletteState] = useState<ThemePalette>("classic");
   const [sidebarPosition, setSidebarPositionState] = useState<SidebarPosition>("sidebar");
-  const [, startTransition] = useTransition();
   const systemPreference = useSystemColorScheme();
   const resolvedMode = mode === "system" ? systemPreference : mode;
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (typeof window === "undefined") return;
-    const storedMode = getStoredMode();
-    const storedPalette = getStoredPalette();
-    const storedSidebarPosition = getStoredSidebarPosition();
-    startTransition(() => {
-      setModeState(storedMode);
-      setPaletteState(storedPalette);
-      setSidebarPositionState(storedSidebarPosition);
-    });
-  }, [startTransition]);
+    const nextMode = getDomMode();
+    const nextPalette = getDomPalette();
+    const nextSidebarPosition = getDomSidebarPosition();
 
-  useEffect(() => {
+    setModeState((current) => (current === nextMode ? current : nextMode));
+    setPaletteState((current) => (current === nextPalette ? current : nextPalette));
+    setSidebarPositionState((current) =>
+      current === nextSidebarPosition ? current : nextSidebarPosition,
+    );
+  }, []);
+
+  useIsomorphicLayoutEffect(() => {
     if (typeof window === "undefined") return;
     const root = document.documentElement;
     root.classList.toggle("dark", resolvedMode === "dark");
     root.dataset.theme = palette;
+    root.dataset.themeMode = mode;
+    root.dataset.themeResolved = resolvedMode;
     root.dataset.navigation = sidebarPosition;
     root.style.colorScheme = resolvedMode === "dark" ? "dark" : "light";
-  }, [resolvedMode, palette, sidebarPosition]);
+  }, [mode, resolvedMode, palette, sidebarPosition]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
