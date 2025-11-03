@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BarChart3, Building2, CircuitBoard, Satellite } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -249,10 +250,22 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="text-sm leading-relaxed text-muted-foreground">
-              BAFE spearheads agricultural engineering initiatives and digital
-              transformation for farm-to-market systems and production
-              monitoring.
+            <CardContent className="flex items-center gap-5 text-sm leading-relaxed text-muted-foreground">
+              <div className="flex h-20 w-24 items-center justify-center rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                <Image
+                  src="/bafe_logo.png"
+                  alt="BAFE logo"
+                  width={72}
+                  height={72}
+                  className="h-full w-full object-contain"
+                  priority
+                />
+              </div>
+              <p className="self-center">
+                BAFE spearheads agricultural engineering initiatives and digital
+                transformation for farm-to-market systems and production
+                monitoring.
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -276,10 +289,23 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="text-sm leading-relaxed text-muted-foreground">
-              PhilSA provides satellite imagery and geospatial analytics through
-              the Sentinel-2 program, enabling accurate mapping of corn and onion
-              cultivation areas.
+
+            <CardContent className="flex items-center gap-5 text-sm leading-relaxed text-muted-foreground">
+              <div className="flex h-20 w-24 items-center justify-center rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                <Image
+                  src="/philsa-logo.png"
+                  alt="Philsa logo"
+                  width={72}
+                  height={72}
+                  className="h-full w-full object-contain"
+                  priority
+                />
+              </div>
+              <p className="self-center">
+                PhilSA provides satellite imagery and geospatial analytics through
+                the Sentinel-2 program, enabling accurate mapping of corn and onion
+                cultivation areas.
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -357,15 +383,15 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summary
             ? summary.kpis.map((entry, index) => (
-                <KpiCard
-                  key={entry.id}
-                  label={entry.label}
-                  value={entry.value}
-                  unit={entry.unit || undefined}
-                  description={entry.description}
-                  index={index}
-                />
-              ))
+              <KpiCard
+                key={entry.id}
+                label={entry.label}
+                value={entry.value}
+                unit={entry.unit || undefined}
+                description={entry.description}
+                index={index}
+              />
+            ))
             : summaryError
               ? emptyKpiPlaceholders
               : emptyKpiPlaceholders}
@@ -395,27 +421,27 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
         <div className="grid gap-6 lg:grid-cols-2">
           {summary
             ? [
-                {
-                  title: "Corn Area Trend",
-                  data: summary.trends.corn,
-                  gradientFrom: "var(--chart-1)",
-                  gradientTo: "var(--chart-2)",
-                },
-                {
-                  title: "Onion Area Trend",
-                  data: summary.trends.onion,
-                  gradientFrom: "var(--chart-4)",
-                  gradientTo: "var(--chart-5)",
-                },
-              ].map((trend) => (
-                <TrendCard
-                  key={trend.title}
-                  title={trend.title}
-                  data={trend.data}
-                  gradientFrom={trend.gradientFrom}
-                  gradientTo={trend.gradientTo}
-                />
-              ))
+              {
+                title: "Corn Area Trend",
+                data: summary.trends.corn,
+                gradientFrom: "var(--chart-1)",
+                gradientTo: "var(--chart-2)",
+              },
+              {
+                title: "Onion Area Trend",
+                data: summary.trends.onion,
+                gradientFrom: "var(--chart-4)",
+                gradientTo: "var(--chart-5)",
+              },
+            ].map((trend) => (
+              <TrendCard
+                key={trend.title}
+                title={trend.title}
+                data={trend.data}
+                gradientFrom={trend.gradientFrom}
+                gradientTo={trend.gradientTo}
+              />
+            ))
             : summaryError
               ? emptyTrendPlaceholders
               : emptyTrendPlaceholders}
