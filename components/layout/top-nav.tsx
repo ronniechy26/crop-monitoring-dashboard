@@ -62,8 +62,8 @@ export function TopNav({
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex items-center justify-between rounded-2xl border border-border/60 bg-background/80 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 flex flex-wrap items-center gap-4 rounded-2xl border border-border/60 bg-background/80 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-4 lg:flex-nowrap lg:justify-between lg:px-6">
+        <div className="flex flex-1 min-w-0 items-center gap-3">
           <Button
             variant="outline"
             size="icon"
@@ -78,7 +78,7 @@ export function TopNav({
               variant="ghost"
               size="icon"
               className={cn(
-                "hidden h-10 w-10 rounded-full border border-border/60 bg-muted/40 hover:bg-muted/60 lg:inline-flex",
+                "hidden h-10 w-10 flex-shrink-0 rounded-full border border-border/60 bg-muted/40 hover:bg-muted/60 lg:inline-flex",
                 sidebarCollapsed && "bg-muted/60",
               )}
               onClick={onToggleSidebar}
@@ -91,12 +91,14 @@ export function TopNav({
               )}
             </Button>
           ) : null}
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base font-semibold text-foreground">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-base font-semibold text-foreground">
                 {page.title}
               </h1>
-              <Badge variant="success">{page.accent}</Badge>
+              <Badge variant="success" className="flex-shrink-0">
+                {page.accent}
+              </Badge>
             </div>
             <p className="text-sm text-muted-foreground">{page.subtitle}</p>
           </div>
@@ -147,7 +149,7 @@ export function TopNav({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 240, damping: 28 }}
-              className="absolute left-4 right-14 top-6"
+              className="absolute left-4 right-4 top-6 sm:right-14"
             >
               <div className="relative">
                 <Button

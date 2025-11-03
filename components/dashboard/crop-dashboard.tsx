@@ -127,29 +127,31 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-hidden rounded-2xl border border-border/60">
-              <Table>
-                <TableHeader className="bg-muted/60">
-                  <TableRow>
-                    <TableHead>Barangay</TableHead>
-                    <TableHead>Latest tons</TableHead>
-                    <TableHead>Area (ha)</TableHead>
-                    <TableHead>Avg yield (t/ha)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {barangayRows.map((row) => (
-                    <TableRow key={row.barangay}>
-                      <TableCell className="font-medium text-foreground">
-                        {row.barangay}
-                      </TableCell>
-                      <TableCell>{row.latestProduction.toLocaleString()}</TableCell>
-                      <TableCell>{row.totalArea.toFixed(0)}</TableCell>
-                      <TableCell>{row.averageYield.toFixed(1)}</TableCell>
+            <div className="rounded-2xl border border-border/60">
+              <div className="w-full overflow-x-auto">
+                <Table className="min-w-[520px]">
+                  <TableHeader className="bg-muted/60">
+                    <TableRow>
+                      <TableHead>Barangay</TableHead>
+                      <TableHead>Latest tons</TableHead>
+                      <TableHead>Area (ha)</TableHead>
+                      <TableHead>Avg yield (t/ha)</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {barangayRows.map((row) => (
+                      <TableRow key={row.barangay}>
+                        <TableCell className="font-medium text-foreground">
+                          {row.barangay}
+                        </TableCell>
+                        <TableCell>{row.latestProduction.toLocaleString()}</TableCell>
+                        <TableCell>{row.totalArea.toFixed(0)}</TableCell>
+                        <TableCell>{row.averageYield.toFixed(1)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </CardContent>
         </Card>

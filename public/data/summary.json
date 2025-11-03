@@ -1,0 +1,46 @@
+{
+  "kpis": [
+    {
+      "id": "area",
+      "label": "Total Area Mapped",
+      "value": 186540,
+      "unit": "ha",
+      "description": "Combined extent of monitored corn and onion parcels"
+    },
+    {
+      "id": "barangays",
+      "label": "Barangays Covered",
+      "value": 412,
+      "unit": "",
+      "description": "Priority barangays with active satellite monitoring"
+    },
+    {
+      "id": "confidence",
+      "label": "Avg Detection Confidence",
+      "value": 92,
+      "unit": "%",
+      "description": "Accuracy of crop classification across the latest run"
+    },
+    {
+      "id": "update",
+      "label": "Latest Satellite Update",
+      "value": "2025-02-12",
+      "unit": "",
+      "description": "Last Sentinel-2 revisit used for the dashboard"
+    }
+  ],
+  "trends": {
+    "corn": [
+      { "quarter": "2024 Q1", "area": 41200 },
+      { "quarter": "2024 Q2", "area": 43860 },
+      { "quarter": "2024 Q3", "area": 45620 },
+      { "quarter": "2024 Q4", "area": 47240 }
+    ],
+    "onion": [
+      { "quarter": "2024 Q1", "area": 15800 },
+      { "quarter": "2024 Q2", "area": 16340 },
+      { "quarter": "2024 Q3", "area": 17210 },
+      { "quarter": "2024 Q4", "area": 18650 }
+    ]
+  }
+}

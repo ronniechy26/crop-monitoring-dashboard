@@ -24,7 +24,7 @@ export function CropFilters({ stages, sensors }: CropFiltersProps) {
         </p>
       </div>
       <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {stages.map((item) => (
             <motion.div
               key={item}
@@ -42,7 +42,7 @@ export function CropFilters({ stages, sensors }: CropFiltersProps) {
             </motion.div>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {sensors.map((item) => (
             <motion.div
               key={item}

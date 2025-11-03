@@ -1,258 +1,437 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
-import { ArrowRight, MapPin } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, BarChart3, Building2, CircuitBoard, Satellite } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { CropMetrics, CropSlug } from "@/lib/crop-data";
-import { formatPercentage } from "@/lib/format";
+import { Separator } from "@/components/ui/separator";
+import type { CropMetrics } from "@/lib/crop-data";
 
-import { CropMap } from "./crop-map";
-import { MiniChartCard } from "./mini-chart-card";
-import { StatsCard } from "./stats-card";
+import { KpiCard } from "./kpi-card";
+import { TrendCard } from "./trend-card";
 
 interface LandingDashboardProps {
   corn: CropMetrics;
   onion: CropMetrics;
 }
 
-const locations = [
-  { label: "The Philippines", value: "ph" },
-  { label: "Luzon", value: "luzon" },
-  { label: "Visayas", value: "visayas" },
-  { label: "Mindanao", value: "mindanao" },
-];
+interface KpiSummaryEntry {
+  id: string;
+  label: string;
+  value: number | string;
+  unit?: string;
+  description?: string;
+}
+
+interface TrendPoint {
+  quarter: string;
+  area: number;
+}
+
+interface SummaryData {
+  kpis: KpiSummaryEntry[];
+  trends: {
+    corn: TrendPoint[];
+    onion: TrendPoint[];
+  };
+}
+
+const heroMotion = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, ease: "easeOut" },
+};
 
 export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
-  const [activeCrop, setActiveCrop] = useState<CropSlug>("corn");
-  const [activeLocation, setActiveLocation] = useState("ph");
+  const [summary, setSummary] = useState<SummaryData | null>(null);
+  const [summaryError, setSummaryError] = useState(false);
 
-  const activeMetrics = activeCrop === "corn" ? corn : onion;
+  useEffect(() => {
+    let isMounted = true;
 
-  const colorStops = useMemo(() => {
-    return activeCrop === "corn"
-      ? ["#e0f2fe", "#bae6fd", "#7dd3fc", "#38bdf8", "#0ea5e9"]
-      : ["#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc", "#a855f7"];
-  }, [activeCrop]);
+    const loadSummary = async () => {
+      try {
+        const response = await fetch("/data/summary.json");
+        if (!response.ok) {
+          throw new Error("Failed to load summary");
+        }
+        const payload = (await response.json()) as SummaryData;
+        if (isMounted) {
+          setSummary(payload);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setSummaryError(true);
+        }
+        console.error(error);
+      }
+    };
 
-  const overviewStats = [
+    void loadSummary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const heroHighlights = useMemo(
+    () => [
+      {
+        label: "Corn coverage",
+        value: `${corn.summary.totalArea.toLocaleString()} ha`,
+        context: `NDVI ${corn.summary.avgNdvi.toFixed(2)} • Yield ${corn.summary.avgYield.toFixed(1)} t/ha`,
+      },
+      {
+        label: "Onion coverage",
+        value: `${onion.summary.totalArea.toLocaleString()} ha`,
+        context: `NDVI ${onion.summary.avgNdvi.toFixed(2)} • Yield ${onion.summary.avgYield.toFixed(1)} t/ha`,
+      },
+    ],
+    [corn.summary, onion.summary],
+  );
+
+  const processSteps = [
     {
-      title: "Corn area monitored",
-      value: corn.summary.totalArea.toFixed(0),
-      unit: "ha",
-      helper: "Barangay clusters across North & South corridors",
+      title: "Satellite Observation",
+      agency: "PhilSA",
+      description: "Sentinel-2 captures multispectral imagery of croplands.",
+      icon: Satellite,
     },
     {
-      title: "Onion area monitored",
-      value: onion.summary.totalArea.toFixed(0),
-      unit: "ha",
-      helper: "Key bulb production zones across Central Luzon",
+      title: "Data Processing & Classification",
+      agency: "BAFE + PhilSA",
+      description: "Imagery is analysed and converted into crop-type shapefiles.",
+      icon: CircuitBoard,
     },
     {
-      title: "Corn average yield",
-      value: corn.summary.avgYield.toFixed(1),
-      unit: "t/ha",
-      helper: "Field-estimated yield potential this season",
+      title: "Visualization & Insights",
+      agency: "BAFE",
+      description: "Data is published to the dashboard for analysis and decisions.",
+      icon: BarChart3,
     },
-    {
-      title: "Onion average yield",
-      value: onion.summary.avgYield.toFixed(1),
-      unit: "t/ha",
-      helper: "Bulbing phase outlook across monitored farms",
-    },
-    {
-      title: "Corn canopy health",
-      value: corn.summary.avgNdvi.toFixed(2),
-      helper: "Average NDVI across all monitored corn barangays",
-      footnote: formatPercentage(corn.summary.avgMoisture),
-    },
-    {
-      title: "Onion canopy health",
-      value: onion.summary.avgNdvi.toFixed(2),
-      helper: "NDVI blend with moisture-adjusted sensors",
-      footnote: formatPercentage(onion.summary.avgMoisture),
-    },
-  ];
+  ] as const;
+
+  const emptyKpiPlaceholders = Array.from({ length: 4 }).map((_, index) => (
+    <div
+      key={`kpi-skeleton-${index}`}
+      className="h-36 rounded-2xl border border-dashed border-border/50 bg-muted/20"
+    >
+      <div className="h-full animate-pulse rounded-2xl bg-muted/40" />
+    </div>
+  ));
+
+  const emptyTrendPlaceholders = Array.from({ length: 2 }).map((_, index) => (
+    <div
+      key={`trend-skeleton-${index}`}
+      className="h-48 rounded-2xl border border-dashed border-border/50 bg-muted/20"
+    >
+      <div className="h-full animate-pulse rounded-2xl bg-muted/40" />
+    </div>
+  ));
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.75fr,1fr] 2xl:grid-cols-[2fr,1fr]">
-      <div className="space-y-6">
-        <Card className="border-border/70 bg-card/95 shadow-sm">
-          <CardHeader className="flex flex-col gap-6 pb-0">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                  Crop monitoring atlas
-                </p>
-                <CardTitle className="mt-2 text-3xl font-semibold text-foreground lg:text-4xl">
-                  Corn & Onion in the Philippines
-                </CardTitle>
-              </div>
+    <div className="space-y-12 sm:space-y-14 lg:space-y-16">
+      <section className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-sky-50 via-emerald-50/80 to-amber-50/70 p-6 shadow-sm sm:p-8 lg:p-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(56,189,248,0.25),_transparent_55%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.18),_transparent_60%)]" />
+          <div className="absolute inset-0 backdrop-blur-[1px] mix-blend-multiply" />
+        </div>
+        <div className="relative grid gap-8 lg:grid-cols-[1.6fr,1fr] lg:items-center lg:gap-10">
+          <motion.div {...heroMotion} className="space-y-8">
+            <div className="inline-flex items-center gap-3 rounded-full border border-sky-200/60 bg-white/90 px-4 py-1 text-sm font-medium text-sky-700 shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              National crop monitoring mission update
+            </div>
+            <div className="space-y-4">
+              <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+                Agri Insights: Crop Monitoring and Analytics
+              </h1>
+              <p className="text-lg text-slate-700 sm:text-xl">
+                Powered by BAFE and PhilSA – Combining Earth Observation and
+                Agricultural Engineering to monitor corn and onion production
+                across the Philippines.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="rounded-full bg-emerald-600 px-6 text-base shadow-lg hover:bg-emerald-600/90">
+                <Link href="/corn">
+                  View Corn Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
               <Button
                 asChild
                 variant="outline"
-                size="sm"
-                className="rounded-full border-border/60 bg-background/80"
+                size="lg"
+                className="rounded-full border-slate-300 bg-white/80 px-6 text-base text-slate-800 shadow-sm backdrop-blur hover:bg-white"
               >
-                <Link href="/corn">
-                  Explore dashboards
+                <Link href="/onion">
+                  View Onion Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-muted/40 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <MapPin className="h-4 w-4 text-foreground/80" />
-                Location focus
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+                  BAFE
+                </div>
+                <Separator orientation="vertical" className="hidden h-6 w-[1.5px] bg-slate-300 sm:block" />
+                <div className="rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+                  PhilSA
+                </div>
               </div>
-              <select
-                value={activeLocation}
-                onChange={(event) => setActiveLocation(event.target.value)}
-                className="h-9 rounded-full border border-border/70 bg-background px-4 text-sm font-medium text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
-              >
-                {locations.map((location) => (
-                  <option key={location.value} value={location.value}>
-                    {location.label}
-                  </option>
-                ))}
-              </select>
-              <div className="ml-auto flex gap-2 text-xs text-muted-foreground">
-                <span className="rounded-full border border-border/60 px-2 py-0.5">
-                  {corn.features.length} corn blocks
-                </span>
-                <span className="rounded-full border border-border/60 px-2 py-0.5">
-                  {onion.features.length} onion blocks
-                </span>
-              </div>
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-500">
+                Joint platform for satellite-enabled agriculture
+              </p>
             </div>
-          </CardHeader>
-          <CardContent className="mt-6">
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {overviewStats.map((stat) => (
-                <StatsCard key={stat.title} {...stat} />
+          </motion.div>
+
+          <motion.div
+            {...heroMotion}
+            transition={{ duration: 0.65, ease: "easeOut", delay: 0.1 }}
+            className="space-y-5 rounded-2xl border border-white/40 bg-white/70 p-6 shadow-lg backdrop-blur"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-500">
+              Field coverage snapshot
+            </p>
+            <Separator className="bg-slate-200/80" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {heroHighlights.map((highlight) => (
+                <Card
+                  key={highlight.label}
+                  className="border border-slate-200/80 bg-slate-50/70 shadow-sm"
+                >
+                  <CardHeader className="space-y-1 pb-2">
+                    <CardTitle className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
+                      {highlight.label}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-2xl font-semibold text-slate-900">
+                      {highlight.value}
+                    </p>
+                    <p className="text-[13px] text-slate-600">
+                      {highlight.context}
+                    </p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </motion.div>
+        </div>
+      </section>
 
-        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-          <MiniChartCard
-            metrics={corn}
-            accent="Corn trend"
-            gradientFrom="hsl(var(--chart-1))"
-            gradientTo="hsl(var(--chart-2))"
-          />
-          <MiniChartCard
-            metrics={onion}
-            accent="Onion trend"
-            gradientFrom="hsl(var(--chart-4))"
-            gradientTo="hsl(var(--chart-5))"
-          />
-          <Card className="border-border/60 bg-card/95 shadow-sm 2xl:flex 2xl:flex-col 2xl:justify-center 2xl:p-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Weekly signals
-              </CardTitle>
+      <section className="grid gap-6 lg:grid-cols-2">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+        >
+          <Card className="h-full border-border/60 bg-card/90 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/75">
+            <CardHeader className="flex items-start gap-4 pb-3">
+              <span className="rounded-full bg-emerald-100 p-2 text-emerald-700">
+                <Building2 className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                  Bureau of Agricultural and Fisheries Engineering
+                </p>
+                <CardTitle className="mt-2 text-xl font-semibold text-foreground">
+                  BAFE
+                </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="grid gap-3 text-sm text-muted-foreground">
-              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-                <span>Northern ridge moisture</span>
-                <span className="font-semibold text-foreground">-3.4%</span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-                <span>Bulb size trajectory</span>
-                <span className="font-semibold text-foreground">+1.2%</span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-                <span>Scouting backlog</span>
-                <span className="font-semibold text-foreground">4 barangays</span>
-              </div>
+            <CardContent className="text-sm leading-relaxed text-muted-foreground">
+              BAFE spearheads agricultural engineering initiatives and digital
+              transformation for farm-to-market systems and production
+              monitoring.
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
+        >
+          <Card className="h-full border-border/60 bg-card/90 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/75">
+            <CardHeader className="flex items-start gap-4 pb-3">
+              <span className="rounded-full bg-sky-100 p-2 text-sky-700">
+                <Satellite className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                  Philippine Space Agency
+                </p>
+                <CardTitle className="mt-2 text-xl font-semibold text-foreground">
+                  PhilSA
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="text-sm leading-relaxed text-muted-foreground">
+              PhilSA provides satellite imagery and geospatial analytics through
+              the Sentinel-2 program, enabling accurate mapping of corn and onion
+              cultivation areas.
+            </CardContent>
+          </Card>
+        </motion.div>
+      </section>
 
-        <Card className="border-border/60 bg-card/95 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">
-              Season outlook & advisory highlights
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 text-sm text-muted-foreground">
-            <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
-              <p className="font-medium text-foreground">
-                Corn tasseling window approaching
-              </p>
-              <p>
-                Elevate irrigation for ridge barangays as the V10 growth stage
-                approaches. Monitor moisture dip signaled by the weekly trend.
-              </p>
+      <section className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="space-y-2"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            How the process works
+          </p>
+          <h2 className="text-2xl font-semibold text-foreground">
+            From spaceborne observation to actionable insights
+          </h2>
+        </motion.div>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:justify-between">
+          {processSteps.map((step, index) => (
+            <div key={step.title} className="flex flex-1 items-stretch">
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{ duration: 0.45, ease: "easeOut", delay: index * 0.06 }}
+                className="relative flex-1"
+              >
+                <Card className="h-full border-border/60 bg-card/95 shadow-sm">
+                  <CardHeader className="flex items-start gap-4 pb-3">
+                    <span className="rounded-full bg-muted/70 p-2 text-muted-foreground">
+                      <step.icon className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-muted-foreground">
+                        {step.agency}
+                      </p>
+                      <CardTitle className="mt-2 text-lg font-semibold text-foreground">
+                        {step.title}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </CardContent>
+                </Card>
+                {index < processSteps.length - 1 ? (
+                  <div className="absolute top-1/2 right-[-18px] hidden h-[2px] w-12 -translate-y-1/2 bg-border/60 lg:block">
+                    <span className="absolute right-0 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 bg-border/60" />
+                  </div>
+                ) : null}
+              </motion.div>
             </div>
-            <div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
-              <p className="font-medium text-foreground">
-                Onion bulbing remains stable
-              </p>
-              <p>
-                Pest pressure remains low; focus on balanced fertigation to
-                maintain NDVI above {onion.summary.avgNdvi.toFixed(2)} across
-                the monitored barangays.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-dashed border-border/50 bg-background/80 p-4 text-xs">
-              Connect your Leaflet-ready NDVI or rainfall layers to enrich this
-              overview with live satellite overlays.
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <aside className="space-y-4 xl:sticky xl:top-24">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-muted/40 px-4 py-3">
-          <div className="text-sm font-semibold text-foreground/85">
-            Philippine crop timelapse
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant={activeCrop === "corn" ? "accent" : "outline"}
-              size="sm"
-              className="rounded-full text-xs"
-              onClick={() => setActiveCrop("corn")}
-            >
-              Corn
-            </Button>
-            <Button
-              variant={activeCrop === "onion" ? "accent" : "outline"}
-              size="sm"
-              className="rounded-full text-xs"
-              onClick={() => setActiveCrop("onion")}
-            >
-              Onion
-            </Button>
-          </div>
+          ))}
         </div>
-        <Card className="border-border/60 bg-card/95 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-muted-foreground">
-              Network uptime
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm text-muted-foreground">
-            <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-              <span>Satellite revisit</span>
-              <span className="font-semibold text-foreground">72 hours</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-              <span>Soil probes online</span>
-              <span className="font-semibold text-foreground">14</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2">
-              <span>AI advisories</span>
-              <span className="font-semibold text-foreground">6 signals</span>
-            </div>
-          </CardContent>
-        </Card>
-      </aside>
+      </section>
+
+      <section className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="space-y-2"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            Overview KPIs
+          </p>
+          <h2 className="text-2xl font-semibold text-foreground">
+            National monitoring at a glance
+          </h2>
+        </motion.div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {summary
+            ? summary.kpis.map((entry, index) => (
+                <KpiCard
+                  key={entry.id}
+                  label={entry.label}
+                  value={entry.value}
+                  unit={entry.unit || undefined}
+                  description={entry.description}
+                  index={index}
+                />
+              ))
+            : summaryError
+              ? emptyKpiPlaceholders
+              : emptyKpiPlaceholders}
+        </div>
+        {summaryError ? (
+          <p className="text-xs text-destructive">
+            Unable to load summary data. Showing mission defaults.
+          </p>
+        ) : null}
+      </section>
+
+      <section className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="space-y-2"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            Seasonal trends
+          </p>
+          <h2 className="text-2xl font-semibold text-foreground">
+            Satellite-observed crop area evolution
+          </h2>
+        </motion.div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {summary
+            ? [
+                {
+                  title: "Corn Area Trend",
+                  data: summary.trends.corn,
+                  gradientFrom: "#22c55e",
+                  gradientTo: "#bbf7d0",
+                },
+                {
+                  title: "Onion Area Trend",
+                  data: summary.trends.onion,
+                  gradientFrom: "#facc15",
+                  gradientTo: "#fef08a",
+                },
+              ].map((trend) => (
+                <TrendCard
+                  key={trend.title}
+                  title={trend.title}
+                  data={trend.data}
+                  gradientFrom={trend.gradientFrom}
+                  gradientTo={trend.gradientTo}
+                />
+              ))
+            : summaryError
+              ? emptyTrendPlaceholders
+              : emptyTrendPlaceholders}
+        </div>
+        {summaryError ? (
+          <p className="text-xs text-destructive">
+            Trend highlights are using placeholder values while data is unavailable.
+          </p>
+        ) : null}
+      </section>
+
+      <footer className="space-y-4 border-t border-border/60 pt-6 text-sm text-muted-foreground">
+        <p>© 2025 Bureau of Agricultural and Fisheries Engineering (BAFE)</p>
+        <p>In collaboration with the Philippine Space Agency (PhilSA)</p>
+        <p>Data Source: Sentinel-2 Imagery | Developed by PKMDD Digital Systems Team</p>
+      </footer>
     </div>
   );
 }

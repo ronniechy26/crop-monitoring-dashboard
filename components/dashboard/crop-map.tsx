@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/card";
 import type { CropFeature } from "@/lib/crop-data";
 import { formatMonthLabel } from "@/lib/format";
-import type { LeafletChoroplethProps } from "./leaflet-choropleth";
-
 interface CropMapProps {
   cropName: string;
   features: CropFeature[];
@@ -81,7 +79,7 @@ const LeafletChoropleth = dynamic(
   () => import("@/components/dashboard/leaflet-choropleth"),
   {
     ssr: false,
-    loading: () => <div className="h-[360px] w-full bg-muted rounded-2xl" />, 
+    loading: () => <div className="h-[260px] w-full rounded-2xl bg-muted sm:h-[360px]" />,
   }
 );
 function CropMapComponent({
@@ -93,6 +91,8 @@ function CropMapComponent({
 }: CropMapProps) {
   const [monthIndex, setMonthIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const baseHeight = height ?? 720;
+  const [mapHeight, setMapHeight] = useState(() => Math.min(baseHeight, 560));
 
   const monthKey = timelineMonths[monthIndex] ?? "";
 
@@ -127,6 +127,26 @@ function CropMapComponent({
 
     return () => window.clearInterval(timer);
   }, [playing, timelineMonths.length]);
+
+  useEffect(() => {
+    const setResponsiveHeight = () => {
+      const width = window.innerWidth;
+      const target = height ?? 700;
+      if (width < 640) {
+        setMapHeight(Math.min(target, 320));
+      } else if (width < 1024) {
+        setMapHeight(Math.min(target, 460));
+      } else if (width < 1440) {
+        setMapHeight(Math.min(target, 580));
+      } else {
+        setMapHeight(target);
+      }
+    };
+
+    setResponsiveHeight();
+    window.addEventListener("resize", setResponsiveHeight, { passive: true });
+    return () => window.removeEventListener("resize", setResponsiveHeight);
+  }, [height]);
 
   const legendStops = useMemo(() => {
     const span = Math.max(monthStats.max - monthStats.min, 1);
@@ -229,7 +249,7 @@ function CropMapComponent({
             colorStops={colorStops}
             min={monthStats.min}
             max={monthStats.max}
-            height={height}
+            height={mapHeight}
           />
         </div>
       </CardContent>

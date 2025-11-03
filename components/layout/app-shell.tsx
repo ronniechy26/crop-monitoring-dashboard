@@ -23,7 +23,7 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/60">
-      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:px-8 2xl:px-12">
+      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-6 sm:py-6 lg:flex-row lg:px-8 2xl:px-12">
         <div
           className={cn(
             "hidden flex-shrink-0 transition-[width] duration-150 ease-out will-change-[width] lg:block",
