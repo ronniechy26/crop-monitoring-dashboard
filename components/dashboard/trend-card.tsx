@@ -77,8 +77,8 @@ export function TrendCard({
                 <YAxis
                   hide
                   domain={[
-                    (minData) => Math.max((minData as number) - 2500, 0),
-                    (maxData) => (maxData as number) + 2500,
+                    (minData : number) => Math.max((minData as number) - 2500, 0),
+                    (maxData : number) => (maxData as number) + 2500,
                   ]}
                 />
                 <Tooltip
