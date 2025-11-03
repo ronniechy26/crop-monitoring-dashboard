@@ -9,8 +9,8 @@ export default async function CornPage() {
       crop="corn"
       metrics={metrics}
       gradient={{
-        from: "hsl(var(--chart-1))",
-        to: "hsl(var(--chart-2))",
+        from: "var(--chart-1)",
+        to: "var(--chart-2)",
       }}
     />
   );

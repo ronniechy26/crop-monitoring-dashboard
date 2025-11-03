@@ -9,8 +9,8 @@ export default async function OnionPage() {
       crop="onion"
       metrics={metrics}
       gradient={{
-        from: "hsl(var(--chart-4))",
-        to: "hsl(var(--chart-5))",
+        from: "var(--chart-4)",
+        to: "var(--chart-5)",
       }}
     />
   );

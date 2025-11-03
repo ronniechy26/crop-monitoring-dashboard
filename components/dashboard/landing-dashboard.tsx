@@ -398,14 +398,14 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
                 {
                   title: "Corn Area Trend",
                   data: summary.trends.corn,
-                  gradientFrom: "#22c55e",
-                  gradientTo: "#bbf7d0",
+                  gradientFrom: "var(--chart-1)",
+                  gradientTo: "var(--chart-2)",
                 },
                 {
                   title: "Onion Area Trend",
                   data: summary.trends.onion,
-                  gradientFrom: "#facc15",
-                  gradientTo: "#fef08a",
+                  gradientFrom: "var(--chart-4)",
+                  gradientTo: "var(--chart-5)",
                 },
               ].map((trend) => (
                 <TrendCard

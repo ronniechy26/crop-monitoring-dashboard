@@ -39,8 +39,8 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
   const latestMonthLabel = latestMonth ? formatMonthLabel(latestMonth) : "";
   const colorStops =
     crop === "corn"
-      ? ["#e0f2fe", "#bae6fd", "#7dd3fc", "#38bdf8", "#0ea5e9"]
-      : ["#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc", "#a855f7"];
+      ? ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"]
+      : ["var(--chart-4)", "var(--chart-5)", "var(--chart-3)", "var(--chart-2)", "var(--chart-1)"];
   const barangayRows = metrics.barangayProduction
     .slice()
     .sort((a, b) => b.latestProduction - a.latestProduction);

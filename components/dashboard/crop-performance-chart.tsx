@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import {
   Area,
   Bar,
@@ -26,12 +27,14 @@ export function CropPerformanceChart({
   stroke,
   fill,
 }: CropPerformanceChartProps) {
+  const gradientId = `${useId()}-yield`;
+
   return (
     <div className="h-[240px] w-full sm:h-[320px]">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data}>
           <defs>
-            <linearGradient id={`chart-fill-${stroke}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={fill} stopOpacity={0.7} />
               <stop offset="95%" stopColor={fill} stopOpacity={0.08} />
             </linearGradient>
@@ -82,7 +85,7 @@ export function CropPerformanceChart({
             dataKey="yield"
             stroke={stroke}
             strokeWidth={2}
-            fill={`url(#chart-fill-${stroke})`}
+            fill={`url(#${gradientId})`}
             name="Yield"
             dot={false}
             activeDot={{ r: 5 }}
@@ -90,7 +93,7 @@ export function CropPerformanceChart({
           <Line
             yAxisId="right"
             type="monotone"
-            stroke="hsl(var(--chart-3))"
+            stroke="var(--chart-3)"
             strokeWidth={2}
             dataKey="ndvi"
             name="NDVI"
@@ -99,7 +102,7 @@ export function CropPerformanceChart({
           <Line
             yAxisId="right"
             type="monotone"
-            stroke="hsl(var(--chart-2))"
+            stroke="var(--chart-2)"
             strokeDasharray="6 6"
             dataKey="soilMoisture"
             name="Soil Moisture"
@@ -109,7 +112,7 @@ export function CropPerformanceChart({
             yAxisId="right"
             dataKey="rainfall"
             name="Rainfall"
-            fill="hsl(var(--chart-5))"
+            fill="var(--chart-5)"
             opacity={0.6}
           />
         </ComposedChart>

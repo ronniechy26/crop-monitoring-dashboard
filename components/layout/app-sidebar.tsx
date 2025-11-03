@@ -1,13 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Sprout, Carrot, Settings } from "lucide-react";
+import { LayoutDashboard, Sprout, Carrot, Settings, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { ThemeControls } from "@/components/layout/theme-controls";
 
 const navItems = [
   {
@@ -30,14 +32,6 @@ const navItems = [
   },
 ];
 
-const secondaryItems = [
-  {
-    label: "Settings",
-    icon: Settings,
-    href: "#",
-  },
-];
-
 interface AppSidebarProps {
   className?: string;
   onNavigate?: () => void;
@@ -50,6 +44,9 @@ export function AppSidebar({
   collapsed = false,
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const isSettingsOpen = !collapsed && settingsOpen;
 
   return (
     <aside
@@ -107,14 +104,19 @@ export function AppSidebar({
                 key={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-sm transition-all hover:border-border/60 hover:bg-sidebar-accent/60 hover:text-foreground",
-                  isActive && "text-sidebar-primary-foreground",
+                  "group relative flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-sm transition-all hover:border-border/60 hover:bg-sidebar-accent/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring/50",
+                  isActive
+                    ? "border-sidebar-primary/40 bg-sidebar-primary/15 text-sidebar-primary-foreground shadow-sm"
+                    : "text-muted-foreground",
                   collapsed && "justify-center px-2",
                 )}
+                data-active={isActive ? "true" : undefined}
+                data-collapsed={collapsed ? "true" : undefined}
+                aria-current={isActive ? "page" : undefined}
               >
                 <Icon
                   className={cn(
-                    "h-5 w-5 text-muted-foreground transition",
+                    "h-5 w-5 text-muted-foreground transition-colors group-data-[active=true]:text-sidebar-primary",
                     isActive && "text-sidebar-primary",
                   )}
                 />
@@ -129,8 +131,11 @@ export function AppSidebar({
                 {isActive && (
                   <motion.span
                     layoutId="sidebar-active-pill"
-                    className="absolute inset-0 -z-10 rounded-xl bg-sidebar-primary/15 shadow-inner"
-                    transition={{ type: "spring", stiffness: 260, damping: 30 }}
+                    className={cn(
+                      "pointer-events-none absolute inset-0 -z-10 rounded-xl border border-sidebar-primary/35 bg-sidebar-primary/20 shadow-[0_8px_24px_rgba(15,23,42,0.08)]",
+                      collapsed && "inset-1 rounded-full border-sidebar-primary/40 bg-sidebar-primary/30"
+                    )}
+                    transition={{ type: "spring", stiffness: 300, damping: 28 }}
                   />
                 )}
               </Link>
@@ -140,23 +145,36 @@ export function AppSidebar({
 
         <div
           className={cn(
-            "mt-auto space-y-2 border-t border-border/60 pt-4 text-xs transition-opacity duration-200",
+            "mt-auto space-y-3 border-t border-border/60 pt-4 text-xs transition-opacity duration-200",
             collapsed ? "opacity-0 pointer-events-none" : "opacity-100",
           )}
         >
-          {secondaryItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
-              >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          <button
+            type="button"
+            onClick={() =>
+              setSettingsOpen((open) => (collapsed ? open : !open))
+            }
+            className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-muted-foreground transition hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring/50"
+          >
+            <span className="flex items-center gap-3">
+              <Settings className="h-4 w-4" />
+              <span className="font-medium">Settings</span>
+            </span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                isSettingsOpen ? "rotate-180" : undefined,
+              )}
+            />
+          </button>
+          {isSettingsOpen ? (
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+                Theme presets
+              </p>
+              <ThemeControls variant="stacked" className="mt-3" />
+            </div>
+          ) : null}
         </div>
       </nav>
     </aside>
