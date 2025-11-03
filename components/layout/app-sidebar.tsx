@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Sprout, Carrot, Settings, ChevronDown } from "lucide-react";
+import { Settings, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,27 +10,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { ThemeControls } from "@/components/layout/theme-controls";
-
-const navItems = [
-  {
-    href: "/",
-    label: "Overview",
-    description: "Monitoring pulse",
-    icon: LayoutDashboard,
-  },
-  {
-    href: "/corn",
-    label: "Corn",
-    description: "Fields & insights",
-    icon: Sprout,
-  },
-  {
-    href: "/onion",
-    label: "Onion",
-    description: "Irrigation health",
-    icon: Carrot,
-  },
-];
+import { navigationLinks } from "@/components/layout/nav-links";
 
 interface AppSidebarProps {
   className?: string;
@@ -93,7 +73,7 @@ export function AppSidebar({
         )}
       >
         <div className="flex flex-col gap-2">
-          {navItems.map((item) => {
+          {navigationLinks.map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href !== "/" && pathname?.startsWith(item.href));
@@ -172,7 +152,11 @@ export function AppSidebar({
               <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
                 Theme presets
               </p>
-              <ThemeControls variant="stacked" className="mt-3" />
+              <ThemeControls
+                variant="stacked"
+                showNavigationPlacement
+                className="mt-3"
+              />
             </div>
           ) : null}
         </div>

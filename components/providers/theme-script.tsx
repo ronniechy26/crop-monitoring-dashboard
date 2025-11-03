@@ -4,10 +4,12 @@ const themeBootstrapScript = `
     const storedMode = localStorage.getItem('cmd-theme-mode') || 'system';
     const storedPalette = localStorage.getItem('cmd-theme-palette') || 'classic';
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const navPlacement = localStorage.getItem('cmd-sidebar-position') || 'sidebar';
     const finalMode = storedMode === 'system' ? (prefersDark ? 'dark' : 'light') : storedMode;
     const root = document.documentElement;
     root.classList.toggle('dark', finalMode === 'dark');
     root.dataset.theme = storedPalette;
+    root.dataset.navigation = navPlacement;
     root.style.colorScheme = finalMode === 'dark' ? 'dark' : 'light';
   } catch (error) {
     console.warn('Theme bootstrap failed', error);

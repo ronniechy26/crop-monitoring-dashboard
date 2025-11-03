@@ -153,7 +153,7 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
                 Agri Insights: Crop Monitoring and Analytics
               </h1>
               <p className="text-lg text-slate-700 sm:text-xl">
-                Powered by BAFE and PhilSA – Combining Earth Observation and
+                Combining Earth Observation and
                 Agricultural Engineering to monitor corn and onion production
                 across the Philippines.
               </p>
@@ -430,7 +430,7 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
       <footer className="space-y-4 border-t border-border/60 pt-6 text-sm text-muted-foreground">
         <p>© 2025 Bureau of Agricultural and Fisheries Engineering (BAFE)</p>
         <p>In collaboration with the Philippine Space Agency (PhilSA)</p>
-        <p>Data Source: Sentinel-2 Imagery | Developed by PKMDD Digital Systems Team</p>
+        <p>Data Source: Sentinel-2 Imagery </p>
       </footer>
     </div>
   );

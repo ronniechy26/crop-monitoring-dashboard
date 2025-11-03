@@ -11,10 +11,24 @@ import { cn } from "@/lib/utils";
 interface ThemeControlsProps {
   className?: string;
   variant?: "horizontal" | "stacked";
+  showNavigationPlacement?: boolean;
 }
 
-export function ThemeControls({ className, variant = "horizontal" }: ThemeControlsProps) {
-  const { mode, resolvedMode, setMode, toggleMode, palette, setPalette } = useTheme();
+export function ThemeControls({
+  className,
+  variant = "horizontal",
+  showNavigationPlacement = false,
+}: ThemeControlsProps) {
+  const {
+    mode,
+    resolvedMode,
+    setMode,
+    toggleMode,
+    palette,
+    setPalette,
+    sidebarPosition,
+    setSidebarPosition,
+  } = useTheme();
 
   const handlePaletteChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
@@ -88,6 +102,51 @@ export function ThemeControls({ className, variant = "horizontal" }: ThemeContro
           ))}
         </select>
       </div>
+      {showNavigationPlacement ? (
+        <div
+          className={cn(
+            "flex flex-wrap items-center gap-2",
+            variant === "stacked" ? "flex-col items-start gap-3" : "",
+          )}
+        >
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+            Navigation
+          </span>
+          <div
+            className={cn(
+              "flex gap-2",
+              variant === "stacked" ? "flex-wrap" : "items-center flex-wrap",
+            )}
+          >
+            <Button
+              type="button"
+              size="sm"
+              variant={sidebarPosition === "sidebar" ? "accent" : "outline"}
+              className={cn(
+                "rounded-full text-xs",
+                sidebarPosition === "sidebar" && "shadow-sm",
+              )}
+              onClick={() => setSidebarPosition("sidebar")}
+              aria-pressed={sidebarPosition === "sidebar"}
+            >
+              Sidebar
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={sidebarPosition === "navbar" ? "accent" : "outline"}
+              className={cn(
+                "rounded-full text-xs",
+                sidebarPosition === "navbar" && "shadow-sm",
+              )}
+              onClick={() => setSidebarPosition("navbar")}
+              aria-pressed={sidebarPosition === "navbar"}
+            >
+              Navbar
+            </Button>
+          </div>
+        </div>
+      ) : null}
       <Button
         type="button"
         variant="outline"

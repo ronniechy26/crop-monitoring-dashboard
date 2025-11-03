@@ -8,10 +8,12 @@ import {
   useMemo,
   useState,
   useSyncExternalStore,
+  useTransition,
   type ReactNode,
 } from "react";
 
 type ThemeMode = "light" | "dark" | "system";
+export type SidebarPosition = "sidebar" | "navbar";
 
 export const themePalettes = [
   { value: "classic", label: "Classic Neutral" },
@@ -27,13 +29,16 @@ interface ThemeContextValue {
   mode: ThemeMode;
   resolvedMode: "light" | "dark";
   palette: ThemePalette;
+  sidebarPosition: SidebarPosition;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
   setPalette: (palette: ThemePalette) => void;
+  setSidebarPosition: (position: SidebarPosition) => void;
 }
 
 const MODE_STORAGE_KEY = "cmd-theme-mode";
 const PALETTE_STORAGE_KEY = "cmd-theme-palette";
+const SIDEBAR_POSITION_KEY = "cmd-sidebar-position";
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
@@ -49,6 +54,14 @@ const getStoredPalette = (): ThemePalette => {
   return (
     (window.localStorage.getItem(PALETTE_STORAGE_KEY) as ThemePalette | null) ??
     "classic"
+  );
+};
+
+const getStoredSidebarPosition = (): SidebarPosition => {
+  if (typeof window === "undefined") return "sidebar";
+  return (
+    (window.localStorage.getItem(SIDEBAR_POSITION_KEY) as SidebarPosition | null) ??
+    "sidebar"
   );
 };
 
@@ -79,18 +92,33 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [mode, setModeState] = useState<ThemeMode>(() => getStoredMode());
-  const [palette, setPaletteState] = useState<ThemePalette>(() => getStoredPalette());
+  const [mode, setModeState] = useState<ThemeMode>("system");
+  const [palette, setPaletteState] = useState<ThemePalette>("classic");
+  const [sidebarPosition, setSidebarPositionState] = useState<SidebarPosition>("sidebar");
+  const [, startTransition] = useTransition();
   const systemPreference = useSystemColorScheme();
   const resolvedMode = mode === "system" ? systemPreference : mode;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedMode = getStoredMode();
+    const storedPalette = getStoredPalette();
+    const storedSidebarPosition = getStoredSidebarPosition();
+    startTransition(() => {
+      setModeState(storedMode);
+      setPaletteState(storedPalette);
+      setSidebarPositionState(storedSidebarPosition);
+    });
+  }, [startTransition]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const root = document.documentElement;
     root.classList.toggle("dark", resolvedMode === "dark");
     root.dataset.theme = palette;
+    root.dataset.navigation = sidebarPosition;
     root.style.colorScheme = resolvedMode === "dark" ? "dark" : "light";
-  }, [resolvedMode, palette]);
+  }, [resolvedMode, palette, sidebarPosition]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -101,6 +129,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(PALETTE_STORAGE_KEY, palette);
   }, [palette]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(SIDEBAR_POSITION_KEY, sidebarPosition);
+  }, [sidebarPosition]);
 
   const setMode = useCallback((nextMode: ThemeMode) => {
     setModeState(nextMode);
@@ -119,16 +152,22 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setPaletteState(nextPalette);
   }, []);
 
+  const setSidebarPosition = useCallback((nextPosition: SidebarPosition) => {
+    setSidebarPositionState(nextPosition);
+  }, []);
+
   const value = useMemo<ThemeContextValue>(
     () => ({
       mode,
       resolvedMode,
       palette,
+      sidebarPosition,
       setMode,
       toggleMode,
       setPalette,
+      setSidebarPosition,
     }),
-    [mode, resolvedMode, palette, setMode, toggleMode, setPalette],
+    [mode, resolvedMode, palette, sidebarPosition, setMode, toggleMode, setPalette, setSidebarPosition],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
