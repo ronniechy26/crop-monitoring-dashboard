@@ -453,11 +453,6 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
         ) : null}
       </section>
 
-      <footer className="space-y-4 border-t border-border/60 pt-6 text-sm text-muted-foreground">
-        <p>© 2025 Bureau of Agricultural and Fisheries Engineering (BAFE)</p>
-        <p>In collaboration with the Philippine Space Agency (PhilSA)</p>
-        <p>Data Source: Sentinel-2 Imagery </p>
-      </footer>
     </div>
   );
 }

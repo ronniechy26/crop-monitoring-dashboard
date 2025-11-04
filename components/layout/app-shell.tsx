@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils";
 
 import { ThemeProvider, useTheme } from "@/components/providers/theme-provider";
 
-import { AppSidebar } from "./app-sidebar";
 import { AppNavbar } from "./app-navbar";
+import { AppSidebar } from "./app-sidebar";
+import { AppFooter } from "./app-footer";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -84,7 +85,8 @@ function ShellInner({ children }: AppShellProps) {
               </Button>
             </div>
           ) : null}
-          <main className="space-y-6 pb-16">{children}</main>
+          <main className="space-y-6">{children}</main>
+          <AppFooter className="mt-12" />
         </div>
       </div>
     </div>
