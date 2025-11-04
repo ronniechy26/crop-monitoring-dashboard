@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+export const dynamic = "force-dynamic";
 
 export function AppFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();

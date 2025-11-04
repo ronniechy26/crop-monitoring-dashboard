@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, Suspense, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { LatLngBoundsExpression } from "leaflet";
 import { motion } from "framer-motion";
@@ -241,16 +241,18 @@ function CropMapComponent({
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-border/60">
-          <LeafletChoropleth
-            features={features}
-            bounds={bounds}
-            center={center}
-            monthKey={monthKey}
-            colorStops={colorStops}
-            min={monthStats.min}
-            max={monthStats.max}
-            height={mapHeight}
-          />
+          <Suspense fallback={<div className={`h-[${mapHeight}px] w-full animate-pulse rounded-2xl bg-muted/50`} />}>
+            <LeafletChoropleth
+              features={features}
+              bounds={bounds}
+              center={center}
+              monthKey={monthKey}
+              colorStops={colorStops}
+              min={monthStats.min}
+              max={monthStats.max}
+              height={mapHeight}
+            />
+          </Suspense>
         </div>
       </CardContent>
     </Card>

@@ -22,6 +22,7 @@ import { CropFilters } from "./crop-filters";
 import { CropPerformanceChart } from "./crop-performance-chart";
 import { KPIGrid } from "./kpi-grid";
 import { CropMap } from "./crop-map";
+import { Suspense } from "react";
 
 interface CropDashboardProps {
   metrics: CropMetrics;
@@ -158,13 +159,15 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
       </div>
 
       <aside className="space-y-4 xl:sticky xl:top-24">
-        <CropMap
-          cropName={friendly}
-          features={metrics.features}
-          timelineMonths={metrics.timelineMonths}
-          colorStops={colorStops}
-          height={760}
-        />
+        <Suspense fallback={<div className="h-[760px] w-full animate-pulse rounded-2xl bg-muted/50" />}>
+          <CropMap
+            cropName={friendly}
+            features={metrics.features}
+            timelineMonths={metrics.timelineMonths}
+            colorStops={colorStops}
+            height={760}
+          />
+        </Suspense>
         <Card className="border-border/60 bg-card/95 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">

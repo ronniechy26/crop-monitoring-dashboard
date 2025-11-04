@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useTransition, useState } from "react";
+import { useCallback, useTransition, useState, Suspense } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -86,7 +86,9 @@ function ShellInner({ children }: AppShellProps) {
             </div>
           ) : null}
           <main className="space-y-6">{children}</main>
-          <AppFooter className="mt-12" />
+          <Suspense fallback={<span>...</span>}>
+            <AppFooter className="mt-12" />
+          </Suspense>
         </div>
       </div>
     </div>
