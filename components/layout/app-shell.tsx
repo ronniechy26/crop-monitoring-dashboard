@@ -86,11 +86,9 @@ function ShellInner({ children }: AppShellProps) {
             </div>
           ) : null}
           <main className="space-y-6">{children}</main>
-          <Suspense fallback={<span>...</span>}>
-            <AppFooter className="mt-12" />
-          </Suspense>
         </div>
       </div>
+      <AppFooter className="mt-12" />
     </div>
   );
 }
