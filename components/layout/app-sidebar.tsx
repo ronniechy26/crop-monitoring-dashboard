@@ -31,7 +31,8 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "group flex w-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-sidebar/70 backdrop-blur supports-[backdrop-filter]:bg-sidebar/50 transition-colors",
+        "group flex w-full flex-col rounded-2xl border border-border/60 bg-sidebar/70 backdrop-blur supports-[backdrop-filter]:bg-sidebar/50 transition-colors",
+        "max-h-[85vh] overflow-y-auto md:max-h-none md:overflow-visible",
         collapsed ? "max-w-[88px] px-2" : "max-w-[260px] px-0",
         className,
       )}

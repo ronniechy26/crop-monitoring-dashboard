@@ -39,11 +39,11 @@ export function AppNavbar() {
                 width={48}
                 height={48}
               />
-              <div className="hidden flex-col leading-tight md:flex">
-                <span className="text-sm font-semibold text-foreground">
+              <div className="flex flex-col leading-tight text-xs sm:text-sm">
+                <span className="font-semibold text-foreground">
                   Crop Monitor
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">
                   Early season beta
                 </span>
               </div>

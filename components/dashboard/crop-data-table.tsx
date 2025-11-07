@@ -15,7 +15,7 @@ interface CropDataTableProps {
 export function CropDataTable({ metrics }: CropDataTableProps) {
   return (
     <div className="rounded-2xl border border-border/60 bg-card">
-      <div className="w-full overflow-x-auto">
+      <div className="hidden w-full overflow-x-auto md:block">
         <Table className="min-w-[640px]">
           <TableHeader className="bg-muted/60">
             <TableRow>
@@ -42,6 +42,49 @@ export function CropDataTable({ metrics }: CropDataTableProps) {
             ))}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex flex-col gap-3 p-4 text-sm md:hidden">
+        {metrics.table.map((row) => (
+          <div
+            key={row.id}
+            className="rounded-xl border border-border/60 bg-muted/30 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-base font-semibold text-foreground">{row.name}</p>
+              <span className="rounded-full bg-muted/70 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                {row.barangay}
+              </span>
+            </div>
+            <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">Area</dt>
+                <dd className="font-semibold text-foreground">
+                  {row.area.toFixed(0)} ha
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">Yield</dt>
+                <dd className="font-semibold text-foreground">
+                  {row.yield.toFixed(1)} t/ha
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">
+                  Soil moisture
+                </dt>
+                <dd className="font-semibold text-foreground">
+                  {(row.moisture * 100).toFixed(0)}%
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">NDVI</dt>
+                <dd className="font-semibold text-foreground">
+                  {row.ndvi.toFixed(2)}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        ))}
       </div>
     </div>
   );
