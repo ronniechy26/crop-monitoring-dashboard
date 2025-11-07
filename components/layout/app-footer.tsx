@@ -1,5 +1,20 @@
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
+
+const partnerLogos = [
+  {
+    name: "Bureau of Agricultural and Fisheries Engineering (BAFE)",
+    src: "/bafe_logo.png",
+    alt: "BAFE logo",
+  },
+  {
+    name: "Philippine Space Agency (PhilSA)",
+    src: "/philsa-logo.png",
+    alt: "PhilSA logo",
+  },
+];
 
 export function AppFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
@@ -35,16 +50,25 @@ export function AppFooter({ className }: { className?: string }) {
               <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground/70">
                 Strategic partners
               </h3>
-              <ul className="mt-3 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary/70" aria-hidden />
-                  <span>Bureau of Agricultural and Fisheries Engineering (BAFE)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary/70" aria-hidden />
-                  <span>Philippine Space Agency (PhilSA)</span>
-                </li>
-              </ul>
+              <div className="mt-5 space-y-4">
+                {partnerLogos.map((partner) => (
+                  <div
+                    key={partner.name}
+                    className="flex items-center gap-4"
+                  >
+                    <Image
+                      src={partner.src}
+                      alt={partner.alt}
+                      width={64}
+                      height={64}
+                      className="h-10 w-auto max-w-[56px] flex-shrink-0 object-contain"
+                    />
+                    <span className="text-sm font-semibold text-foreground/80">
+                      {partner.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground/70">
