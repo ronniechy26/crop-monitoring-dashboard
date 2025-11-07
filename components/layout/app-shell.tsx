@@ -42,19 +42,16 @@ function ShellInner({ children }: AppShellProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-background via-background to-muted/60">
-      {showSidebar ? (
-        <div className="lg:hidden">
-          <AppNavbar />
-        </div>
-      ) : (
+      <div className="fixed inset-x-0 top-0 z-50">
         <AppNavbar />
-      )}
-      <div
-        className={cn(
-          "mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-6 sm:py-6",
-          showSidebar ? "lg:flex-row lg:px-8 2xl:px-12" : "lg:px-10 2xl:px-16",
-        )}
-      >
+      </div>
+      <div className="pt-24 sm:pt-28">
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 pb-5 pt-5 sm:gap-6 sm:px-6 sm:pb-6 sm:pt-6",
+            showSidebar ? "lg:flex-row lg:px-8 2xl:px-12" : "lg:px-10 2xl:px-16",
+          )}
+        >
         {showSidebar ? (
           <div
             className={cn(
@@ -92,6 +89,7 @@ function ShellInner({ children }: AppShellProps) {
             </div>
           ) : null}
           <main className="space-y-5 sm:space-y-6">{children}</main>
+        </div>
         </div>
       </div>
       <AppFooter className="mt-12" />
