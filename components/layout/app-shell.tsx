@@ -45,7 +45,7 @@ function ShellInner({ children }: AppShellProps) {
       <div className="fixed inset-x-0 top-0 z-50">
         <AppNavbar />
       </div>
-      <div className="pt-24 sm:pt-28">
+      <div className="pt-16 sm:pt-20">
         <div
           className={cn(
             "mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 pb-5 pt-5 sm:gap-6 sm:px-6 sm:pb-6 sm:pt-6",
