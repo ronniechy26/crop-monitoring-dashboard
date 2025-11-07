@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { ThemeScript } from "@/components/providers/theme-script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -34,7 +35,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} bg-muted/40 antialiased overflow-x-hidden`}
+        className={`${nunito.variable} ${geistMono.variable} bg-muted/40 antialiased overflow-x-hidden`}
       >
         <AppShell>{children}</AppShell>
       </body>

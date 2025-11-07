@@ -2,7 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, BarChart3, Building2, CircuitBoard, Satellite } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  BarChart3,
+  Building2,
+  CircuitBoard,
+  Droplet,
+  LandPlot,
+  Satellite,
+  Shield,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -94,6 +104,66 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
     [corn.summary, onion.summary],
   );
 
+  const cornFeatureCount = corn.features.length;
+  const onionFeatureCount = onion.features.length;
+  const cornBarangayCount = corn.barangayProduction.length;
+  const onionBarangayCount = onion.barangayProduction.length;
+
+  const nationalSnapshot = {
+    totalArea: corn.summary.totalArea + onion.summary.totalArea,
+    avgNdvi: Number(((corn.summary.avgNdvi + onion.summary.avgNdvi) / 2).toFixed(2)),
+    avgMoisture: Number(((corn.summary.avgMoisture + onion.summary.avgMoisture) / 2).toFixed(2)),
+    barangays: cornBarangayCount + onionBarangayCount,
+    monitoredSites: cornFeatureCount + onionFeatureCount,
+    avgConfidence: Math.round(((corn.trend.confidence + onion.trend.confidence) / 2) * 100),
+  };
+
+  const nationalStatCards = [
+    {
+      id: "coverage",
+      label: "Monitored Area",
+      value: `${nationalSnapshot.totalArea.toLocaleString()} ha`,
+      detail: "Corn + onion hectares under active EO watch",
+      icon: LandPlot,
+    },
+    {
+      id: "ndvi",
+      label: "Average NDVI",
+      value: nationalSnapshot.avgNdvi.toFixed(2),
+      detail: "Vegetation vigor (2-week composite)",
+      icon: Activity,
+    },
+    {
+      id: "moisture",
+      label: "Avg Soil Moisture",
+      value: nationalSnapshot.avgMoisture.toFixed(2),
+      detail: "Topsoil moisture index across sites",
+      icon: Droplet,
+    },
+    {
+      id: "sites",
+      label: "Active Monitoring Sites",
+      value: nationalSnapshot.monitoredSites.toLocaleString(),
+      detail: `${nationalSnapshot.barangays.toLocaleString()} barangays dispatching shapefiles`,
+      icon: Shield,
+    },
+  ] as const;
+
+  const missionBulletins = [
+    {
+      crop: "Corn",
+      change: corn.trend.weeklyChange,
+      alert: corn.trend.alert,
+      confidence: Math.round(corn.trend.confidence * 100),
+    },
+    {
+      crop: "Onion",
+      change: onion.trend.weeklyChange,
+      alert: onion.trend.alert,
+      confidence: Math.round(onion.trend.confidence * 100),
+    },
+  ] as const;
+
   const processSteps = [
     {
       title: "Satellite Observation",
@@ -144,7 +214,7 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
           <div className="absolute inset-0 backdrop-blur-[1px] mix-blend-multiply" />
         </div>
         <div className="relative grid gap-8 lg:grid-cols-[1.6fr,1fr] lg:items-center lg:gap-10">
-          <motion.div {...heroMotion} className="space-y-8">
+          <motion.div {...heroMotion} className="relative space-y-8">
             <div className="inline-flex items-center gap-3 rounded-full border border-sky-200/60 bg-white/90 px-4 py-1 text-sm font-medium text-sky-700 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               National crop monitoring mission update
@@ -227,6 +297,93 @@ export function LandingDashboard({ corn, onion }: LandingDashboardProps) {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[2.2fr,1fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+        >
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+              National situationer
+            </p>
+            <h2 className="text-2xl font-semibold text-foreground">
+              Consolidated crop monitoring metrics
+            </h2>
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {nationalStatCards.map((card) => (
+              <Card key={card.id} className="border-border/60 bg-card/95 shadow-sm">
+                <CardHeader className="flex flex-col gap-3 pb-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">
+                        {card.label}
+                      </p>
+                      <CardTitle className="mt-1 text-2xl font-semibold text-foreground">
+                        {card.value}
+                      </CardTitle>
+                    </div>
+                    <span className="rounded-full bg-muted/50 p-2 text-muted-foreground">
+                      <card.icon className="h-5 w-5" />
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{card.detail}</p>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
+        >
+          <Card className="h-full border-border/60 bg-card/95 shadow-sm">
+            <CardHeader className="pb-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
+                Field advisories
+              </p>
+              <CardTitle className="text-xl font-semibold text-foreground">
+                Situation bulletin
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Issued by DA-BAFE and PhilSA based on the latest satellite tasking cycle.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {missionBulletins.map((entry) => (
+                <div
+                  key={entry.crop}
+                  className="rounded-2xl border border-border/60 bg-muted/30 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-muted/20"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-muted-foreground">
+                      {entry.crop}
+                    </p>
+                    <span
+                      className={`text-sm font-semibold ${
+                        entry.change >= 0 ? "text-emerald-600" : "text-amber-600"
+                      }`}
+                    >
+                      {entry.change >= 0 ? "+" : ""}
+                      {entry.change.toFixed(1)}% WoW
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{entry.alert}</p>
+                  <div className="mt-3 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    <span>Confidence {entry.confidence}%</span>
+                    <span>Remote sensing priority</span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
