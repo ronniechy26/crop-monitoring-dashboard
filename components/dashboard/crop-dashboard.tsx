@@ -47,7 +47,7 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
     .sort((a, b) => b.latestProduction - a.latestProduction);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.75fr,1fr] 2xl:grid-cols-[2.05fr,1fr]">
+    <div className="grid w-full min-w-0 max-w-full gap-6 xl:grid-cols-[1.75fr,1fr] 2xl:grid-cols-[2.05fr,1fr]">
       <div className="space-y-6">
         <Card className="border-border/70 bg-card/95 shadow-sm">
           <CardHeader className="pb-4">
@@ -129,7 +129,7 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
           </CardHeader>
           <CardContent>
             <div className="rounded-2xl border border-border/60">
-              <div className="w-full overflow-x-auto">
+              <div className="hidden w-full overflow-x-auto md:block">
                 <Table className="min-w-[520px]">
                   <TableHeader className="bg-muted/60">
                     <TableRow>
@@ -145,13 +145,50 @@ export function CropDashboard({ metrics, crop, gradient }: CropDashboardProps) {
                         <TableCell className="font-medium text-foreground">
                           {row.barangay}
                         </TableCell>
-                        <TableCell>{row.latestProduction.toLocaleString()}</TableCell>
+                        <TableCell>
+                          {row.latestProduction.toLocaleString()}
+                        </TableCell>
                         <TableCell>{row.totalArea.toFixed(0)}</TableCell>
                         <TableCell>{row.averageYield.toFixed(1)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+              <div className="flex flex-col gap-3 p-4 text-sm md:hidden">
+                {barangayRows.map((row) => (
+                  <div
+                    key={row.barangay}
+                    className="rounded-xl border border-border/60 bg-muted/30 p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-base font-semibold text-foreground">
+                        {row.barangay}
+                      </p>
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {row.totalArea.toFixed(0)} ha
+                      </span>
+                    </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">
+                          Latest tons
+                        </dt>
+                        <dd className="font-semibold text-foreground">
+                          {row.latestProduction.toLocaleString()}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">
+                          Avg yield
+                        </dt>
+                        <dd className="font-semibold text-foreground">
+                          {row.averageYield.toFixed(1)} t/ha
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>

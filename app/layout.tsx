@@ -34,7 +34,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} bg-muted/40 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-muted/40 antialiased overflow-x-hidden`}
       >
         <AppShell>{children}</AppShell>
       </body>

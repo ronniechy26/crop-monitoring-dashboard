@@ -105,8 +105,8 @@ export function ThemeControls({
       {showNavigationPlacement ? (
         <div
           className={cn(
-            "flex flex-wrap items-center gap-2",
-            variant === "stacked" ? "flex-col items-start gap-3" : "",
+            "hidden flex-wrap items-center gap-2 md:flex",
+            variant === "stacked" ? "md:flex-col md:items-start md:gap-3" : "",
           )}
         >
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useTransition, useState, Suspense } from "react";
+import { useCallback, useTransition, useState } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -41,8 +41,14 @@ function ShellInner({ children }: AppShellProps) {
   const effectiveCollapsed = showSidebar ? sidebarCollapsed : false;
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/60">
-      {!showSidebar ? <AppNavbar /> : null}
+    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-background via-background to-muted/60">
+      {showSidebar ? (
+        <div className="lg:hidden">
+          <AppNavbar />
+        </div>
+      ) : (
+        <AppNavbar />
+      )}
       <div
         className={cn(
           "mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-6 sm:py-6",
@@ -63,12 +69,12 @@ function ShellInner({ children }: AppShellProps) {
         ) : null}
         <div
           className={cn(
-            "flex-1",
+            "flex-1 min-w-0",
             showSidebar ? "lg:pl-4 2xl:pl-6" : "",
           )}
         >
           {showSidebar ? (
-            <div className="mb-6 flex justify-end">
+            <div className="mb-6 hidden justify-end lg:flex">
               <Button
                 type="button"
                 variant="ghost"
@@ -85,7 +91,7 @@ function ShellInner({ children }: AppShellProps) {
               </Button>
             </div>
           ) : null}
-          <main className="space-y-6">{children}</main>
+          <main className="space-y-5 sm:space-y-6">{children}</main>
         </div>
       </div>
       <AppFooter className="mt-12" />
