@@ -1,9 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import {
-  emailOTP,
-} from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 
 import * as authSchema from "@/auth-schema";
 import { db } from "@/lib/db";
@@ -48,3 +47,46 @@ export const auth = betterAuth({
     }),
   ],
 });
+
+async function ensureDefaultAdminAccount() {
+  const email = process.env.ADMIN_EMAIL?.trim();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) {
+    return;
+  }
+  const name = process.env.ADMIN_NAME?.trim() || "Administrator";
+
+  try {
+    const existing = await db
+      .select({ id: authSchema.user.id, emailVerified: authSchema.user.emailVerified })
+      .from(authSchema.user)
+      .where(eq(authSchema.user.email, email))
+      .limit(1);
+
+    if (existing.length > 0) {
+      if (!existing[0].emailVerified) {
+        await db
+          .update(authSchema.user)
+          .set({ emailVerified: true })
+          .where(eq(authSchema.user.email, email));
+      }
+      return;
+    }
+
+    await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name,
+      },
+    });
+    await db
+      .update(authSchema.user)
+      .set({ emailVerified: true })
+      .where(eq(authSchema.user.email, email));
+  } catch (error) {
+    console.error("Failed to ensure default admin account", error);
+  }
+}
+
+void ensureDefaultAdminAccount();

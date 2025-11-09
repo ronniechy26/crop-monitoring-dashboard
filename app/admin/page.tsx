@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { signOut } from "@/action/mutation/auth";
-import { getSession } from "@/action/mutation/auth";
+import { getSession } from "@/action/query/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -14,12 +14,11 @@ async function signOutAction() {
 export default async function AdminArea() {
   const session = await getSession();
 
-  console.log(session)
   if (!session) {
     redirect("/admin/login");
   }
 
-  const user = session?.user;
+  const user = session.user;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">

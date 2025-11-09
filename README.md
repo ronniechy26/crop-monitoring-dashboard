@@ -22,7 +22,7 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 Better Auth handles authentication, backed by Drizzle ORM and PostgreSQL.
 
-1. Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (usually `http://localhost:3000` during development), and `DATABASE_URL`.
+1. Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (usually `http://localhost:3000` during development), and `DATABASE_URL`. Also set the default admin credentials via `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and optionally `ADMIN_NAME`. The server seeds this account automatically if it does not exist.
 2. Make sure your database is reachable, then generate the Better Auth schema:
 
    ```bash
@@ -39,7 +39,7 @@ Better Auth handles authentication, backed by Drizzle ORM and PostgreSQL.
 
 ### Hidden admin route
 
-The admin login page still lives at `/admin/login`, but it's now powered by Better Auth email/password flows. Anyone who knows the route can either create an account or sign in, and on success they are redirected to `/admin`. Use your database to manage accounts and revoke access when needed.
+The admin login page still lives at `/admin/login`, but only the seeded administrator can authenticate. Publish the credentials securely (for example via a password manager) and rotate them by updating the env vars and deleting/recreating the database record if needed. Authenticated users are redirected to `/admin`, and all navigation links remain hidden from the public UI.
 
 ## Learn More
 

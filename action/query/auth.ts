@@ -5,11 +5,12 @@ import { auth } from "@/lib/auth";
 
 const cachedSession = cache(async (headerEntries: [string, string][]) => {
   return auth.api.getSession({
-    headers: Object.fromEntries(headerEntries),
+    headers: await headers(),
   });
 });
 
-export async function getSession() {
-  const headerEntries = Array.from(headers().entries());
-  return cachedSession(headerEntries);
-}
+export const getSession = cache(async () => {
+  return await auth.api.getSession({
+    headers: await headers(),
+  });
+});
