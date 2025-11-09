@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useTransition, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -26,6 +27,8 @@ export function AppShell({ children }: AppShellProps) {
 }
 
 function ShellInner({ children }: AppShellProps) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
   const { sidebarPosition } = useTheme();
   const showSidebar = sidebarPosition === "sidebar";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -39,6 +42,10 @@ function ShellInner({ children }: AppShellProps) {
   }, [showSidebar]);
 
   const effectiveCollapsed = showSidebar ? sidebarCollapsed : false;
+
+  if (isAdminRoute) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-background via-background to-muted/60">

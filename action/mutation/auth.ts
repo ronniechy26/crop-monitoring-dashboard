@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import { cache } from "react";
-import { redirect } from "next/navigation";
 
 export const getSession = cache(async () => {
   return await auth.api.getSession({
@@ -16,8 +15,6 @@ export const signOut = async () => {
   await auth.api.signOut({
     headers: await headers(),
   });
-
-  redirect("/");
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

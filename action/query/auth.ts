@@ -3,9 +3,11 @@ import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 
+// React cache instance memoizes per serialized headers.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const cachedSession = cache(async (headerEntries: [string, string][]) => {
   return auth.api.getSession({
-    headers: await headers(),
+    headers: Object.fromEntries(headerEntries),
   });
 });
 

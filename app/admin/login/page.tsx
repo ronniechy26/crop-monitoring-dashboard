@@ -18,24 +18,26 @@ export default async function AdminLoginPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-      <Card className="border border-border/60 bg-background/80 shadow-xl">
-        <CardHeader className="space-y-3">
-          <CardTitle className="text-2xl font-semibold">Private Admin Access</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            This route stays hidden from the public navigation. Share it only with trusted operations
-            personnel who need to monitor crop telemetry.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <AdminLoginForm />
-        </CardContent>
-      </Card>
-      <p className="text-center text-xs text-muted-foreground">
-        <Link href="/" className="underline underline-offset-4">
-          Return to dashboard overview
-        </Link>
-      </p>
+    <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center px-4 py-8">
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+        <Card className="border border-border/60 bg-background/80 shadow-xl">
+          <CardHeader className="space-y-3">
+            <CardTitle className="text-2xl font-semibold">Private Admin Access</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              This route stays hidden from the public navigation. Share it only with trusted operations
+              personnel who need to monitor crop telemetry.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <AdminLoginForm />
+          </CardContent>
+        </Card>
+        <p className="text-center text-xs text-muted-foreground">
+          <Link href="/" className="underline underline-offset-4">
+            Return to dashboard overview
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
