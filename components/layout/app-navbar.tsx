@@ -7,8 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { ThemeControls } from "@/components/layout/theme-controls";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { ThemeControls } from "@/components/layout/theme-controls";
 import { navigationLinks } from "@/components/layout/nav-links";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -49,46 +49,33 @@ export function AppNavbar() {
               </div>
             </div>
           </div>
-          <nav className="hidden flex-1 items-center justify-center md:flex">
-            <div className="relative flex items-center gap-1 rounded-full border border-border/60 bg-muted/20 px-1 py-1 shadow-[0_6px_18px_rgba(15,23,42,0.06)] backdrop-blur supports-[backdrop-filter]:bg-muted/10">
-              {navigationLinks.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/" && pathname?.startsWith(item.href));
+          <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
+            {navigationLinks.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/" && pathname?.startsWith(item.href));
 
-                return (
-                  <motion.div key={item.href} className="relative">
-                    {isActive ? (
-                      <motion.span
-                        layoutId="navbar-active-pill"
-                        className="absolute inset-0 -z-10 rounded-full bg-primary/10 ring-1 ring-primary/20"
-                        transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                      />
-                    ) : null}
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className={cn(
-                        "group relative overflow-hidden rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 data-[active=true]:text-foreground data-[active=true]:shadow-sm",
-                        "hover:bg-transparent hover:text-foreground",
-                      )}
-                      aria-pressed={isActive}
-                      data-active={isActive}
-                    >
-                      <Link href={item.href}>
-                        <span className="relative z-10">{item.label}</span>
-                        <span className="absolute inset-0 -z-10 rounded-full bg-primary/5 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                      </Link>
-                    </Button>
-                  </motion.div>
-                );
-              })}
-            </div>
+              return (
+                <Button
+                  key={item.href}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm font-medium",
+                    isActive ? "shadow-sm" : "text-muted-foreground",
+                  )}
+                >
+                  <Link href={item.href}>{item.label}</Link>
+                </Button>
+              );
+            })}
           </nav>
-          <ThemeControls
-            showNavigationPlacement
-            className="hidden items-center rounded-full border border-border/60 bg-muted/20 px-3 py-1 shadow-[0_6px_18px_rgba(15,23,42,0.06)] backdrop-blur supports-[backdrop-filter]:bg-muted/10 lg:flex"
-          />
+          <div className="hidden items-center lg:flex">
+            <ThemeControls
+              showPalette
+              className="items-center gap-2 rounded-full border border-border/60 bg-muted/20 px-3 py-1"
+            />
+          </div>
         </div>
       </header>
       <AnimatePresence>

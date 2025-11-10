@@ -12,12 +12,14 @@ interface ThemeControlsProps {
   className?: string;
   variant?: "horizontal" | "stacked";
   showNavigationPlacement?: boolean;
+  showPalette?: boolean;
 }
 
 export function ThemeControls({
   className,
   variant = "horizontal",
   showNavigationPlacement = false,
+  showPalette = true,
 }: ThemeControlsProps) {
   const {
     mode,
@@ -81,27 +83,29 @@ export function ThemeControls({
           <Moon className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex items-center gap-2">
-        <label
-          htmlFor="theme-palette"
-          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80"
-        >
-          Theme
-        </label>
-        <select
-          id="theme-palette"
-          value={palette}
-          onChange={handlePaletteChange}
-          className="h-9 rounded-full border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
-          aria-label="Select visual theme"
-        >
-          {themePalettes.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {showPalette ? (
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="theme-palette"
+            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80"
+          >
+            Theme
+          </label>
+          <select
+            id="theme-palette"
+            value={palette}
+            onChange={handlePaletteChange}
+            className="h-9 rounded-full border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+            aria-label="Select visual theme"
+          >
+            {themePalettes.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
       {showNavigationPlacement ? (
         <div
           className={cn(

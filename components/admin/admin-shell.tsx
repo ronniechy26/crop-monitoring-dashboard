@@ -1,22 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart3,
-  Bell,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  FolderOpen,
-  LayoutGrid,
-  Menu,
-  PenSquare,
-  Search,
-  Settings,
-  Users,
-} from "lucide-react";
+import { Bell, ChevronLeft, ChevronRight, FolderOpen, LayoutGrid, Menu, Search, Settings, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -25,9 +13,6 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { label: "Dashboard", href: "/admin", icon: LayoutGrid },
   { label: "Projects", href: "/admin/projects", icon: FolderOpen },
-  { label: "Document Manager", href: "/admin/documents", icon: FileText },
-  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { label: "Form Builder", href: "/admin/forms", icon: PenSquare },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ] as const;
@@ -59,8 +44,8 @@ export function AdminShell({ children, onSignOut }: AdminShellProps) {
   const desktopNav = (
     <div className="flex h-full flex-col gap-6 p-4">
       <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-          CM
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border/60 bg-muted/40 p-1.5">
+          <Image src="/crop-logo.png" alt="Crop Monitor Logo" width={32} height={32} priority />
         </div>
         {!sidebarCollapsed ? (
           <div>
@@ -202,8 +187,8 @@ export function AdminShell({ children, onSignOut }: AdminShellProps) {
           >
             <div className="flex h-full flex-col gap-6 p-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                  CM
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border/60 bg-muted/40 p-1.5">
+                  <Image src="/crop-logo.png" alt="Crop Monitor Logo" width={32} height={32} priority />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Crop Monitor</p>
