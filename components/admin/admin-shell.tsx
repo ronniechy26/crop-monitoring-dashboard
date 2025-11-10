@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { label: "Dashboard", href: "/admin", icon: LayoutGrid },
-  { label: "Projects", href: "/admin/projects", icon: FolderOpen },
+  { label: "Data Pipeline", href: "/admin/pipeline", icon: FolderOpen },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ] as const;
