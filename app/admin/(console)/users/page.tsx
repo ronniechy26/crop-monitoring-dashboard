@@ -1,8 +1,10 @@
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Mail, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 
 import { getSession } from "@/action/query/auth";
 import { getUsers } from "@/action/query/users";
+import { AddUserButton } from "@/components/admin/add-user-button";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { auth } from "@/lib/auth";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
   month: "short",
@@ -36,6 +39,31 @@ function formatRelative(date?: Date | null) {
   }
   const diffDays = Math.round(diffHours / 24);
   return `${Math.max(diffDays, 0)}d ago`;
+}
+
+async function createUser(formData: FormData) {
+  "use server";
+  const name = (formData.get("name") as string | null)?.trim() ?? "";
+  const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
+  const password = formData.get("password") as string | null;
+
+  if (!email || !password) {
+    return;
+  }
+
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name: name || undefined,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to create user via Add User form", error);
+  }
+
+  revalidatePath("/admin/users");
 }
 
 export default async function UsersPage() {
@@ -100,7 +128,7 @@ export default async function UsersPage() {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button variant="outline">Bulk upload (.csv)</Button>
+          <AddUserButton action={createUser} />
           <Button>
             <UserPlus className="mr-2 h-4 w-4" />
             Invite user
