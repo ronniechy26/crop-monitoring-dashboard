@@ -6,9 +6,14 @@ export function AdminDashboardSkeleton() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <SkeletonBlock className="h-5 w-48" />
-        <SkeletonBlock className="h-9 w-80" />
-        <SkeletonBlock className="h-4 w-72" />
+        <p className="text-sm text-muted-foreground">
+          Welcome back,&nbsp;
+          <span className="inline-flex h-4 w-32 animate-pulse rounded-md bg-muted align-middle" />
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">Crop Monitoring Command</h1>
+        <p className="text-sm text-muted-foreground">
+          Live NDVI, moisture, and production feeds for priority crops
+        </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (

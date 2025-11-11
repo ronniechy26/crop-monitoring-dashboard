@@ -5,10 +5,19 @@ function PulseBlock({ className }: { className: string }) {
 export function LandingDashboardSkeleton() {
   return (
     <div className="space-y-8">
-      <div className="space-y-3">
-        <PulseBlock className="h-5 w-32" />
-        <PulseBlock className="h-10 w-64" />
-        <PulseBlock className="h-4 w-72" />
+      <div className="space-y-4">
+        <div className="inline-flex items-center gap-3 rounded-full border border-sky-200/60 bg-white/90 px-4 py-1 text-sm font-medium text-sky-700 shadow-sm">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          National crop monitoring mission update
+        </div>
+        <div className="space-y-3">
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+            Agri Insights: Crop Monitoring and Analytics
+          </h1>
+          <p className="text-lg text-slate-700 sm:text-xl">
+            Combining Earth Observation and Agricultural Engineering to monitor corn and onion production across the Philippines.
+          </p>
+        </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (

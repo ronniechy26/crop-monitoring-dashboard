@@ -38,7 +38,7 @@ Stick to strict TypeScript, 2-space indentation, PascalCase components/hooks, ca
 Prefer the existing Shadcn UI primitives (`@/components/ui/*`) when building or extending interface elements. Only introduce bespoke patterns when a Shadcn component cannot cover the use case, and align new pieces with the same design tokens/spacing system.
 
 ## React Components
-Default to React Server Components for routes, layouts, and shared UI. Only mark a component with `"use client"` when it truly needs client-side hooks, browser APIs, or interactivity that cannot be handled through server actions or props.
+Default to React Server Components for routes, layouts, and shared UI. Only mark a component with `"use client"` when it truly needs client-side hooks, browser APIs, or interactivity that cannot be handled through server actions or props. Limit skeletons and other loading placeholders to genuinely dynamic content—headers, labels, and other static copy should remain readable during loading.
 
 ## Testing Guidelines
 Automated tests are pending; rely on linting plus manual verification in `npm run dev`. When Jest/Vitest/Playwright arrive, colocate `*.test.tsx`, mock Drizzle/PostGIS calls, and cover empty layers, NDVI alerts, and auth gating.

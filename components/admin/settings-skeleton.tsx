@@ -6,9 +6,11 @@ export function SettingsSkeleton() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <SkeletonStrip className="h-4 w-40" />
-        <SkeletonStrip className="h-8 w-72" />
-        <SkeletonStrip className="h-4 w-60" />
+        <p className="text-sm text-muted-foreground">Admin / Settings</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Console Settings</h1>
+        <p className="text-sm text-muted-foreground">
+          Mock configuration panels for display; wire to real mutations when requirements firm up.
+        </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {Array.from({ length: 2 }).map((_, index) => (
