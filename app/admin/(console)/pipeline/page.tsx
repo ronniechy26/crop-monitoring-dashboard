@@ -75,20 +75,20 @@ export default async function DataPipelinePage() {
             <div>
               <p className="text-xs uppercase text-muted-foreground">Enable PostGIS</p>
               <pre className="mt-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground">
-psql $DATABASE_URL -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+                psql $DATABASE_URL -c "CREATE EXTENSION IF NOT EXISTS postgis;"
               </pre>
             </div>
             <div>
               <p className="text-xs uppercase text-muted-foreground">Load GeoJSON</p>
               <pre className="mt-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground">
-ogr2ogr -f PostgreSQL PG:"$DATABASE_URL" data/corn.geojson \
-  -nln crops.corn_fields -nlt MULTIPOLYGON -overwrite
+                ogr2ogr -f PostgreSQL PG:"$DATABASE_URL" data/corn.geojson \
+                -nln crops.corn_fields -nlt MULTIPOLYGON -overwrite
               </pre>
             </div>
             <div>
               <p className="text-xs uppercase text-muted-foreground">Load shapefile</p>
               <pre className="mt-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground">
-shp2pgsql -I -s 4326 data/onion.shp crops.onion_fields | psql $DATABASE_URL
+                shp2pgsql -I -s 4326 data/onion.shp crops.onion_fields | psql $DATABASE_URL
               </pre>
             </div>
           </CardContent>

@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { AdminUser } from "@/types/user";
+import { formatRelativeTime } from "@/lib/format";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
   month: "short",
@@ -27,21 +28,6 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
 });
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
-function formatRelative(date?: Date | null) {
-  if (!date) return "—";
-  const diffMs = Date.now() - date.getTime();
-  const diffMinutes = Math.round(diffMs / 60000);
-  if (Math.abs(diffMinutes) < 60) {
-    return `${Math.max(diffMinutes, 0)}m ago`;
-  }
-  const diffHours = Math.round(diffMinutes / 60);
-  if (Math.abs(diffHours) < 24) {
-    return `${Math.max(diffHours, 0)}h ago`;
-  }
-  const diffDays = Math.round(diffHours / 24);
-  return `${Math.max(diffDays, 0)}d ago`;
-}
 
 export async function UsersContent() {
   const [session, users] = await Promise.all([getSession(), getUsers()]);
@@ -90,7 +76,7 @@ export async function UsersContent() {
     {
       label: "Last update",
       value: lastUpdatedUser?.updatedAt
-        ? formatRelative(new Date(lastUpdatedUser.updatedAt))
+        ? formatRelativeTime(new Date(lastUpdatedUser.updatedAt))
         : "—",
       subtext: lastUpdatedUser?.name ?? "No activity yet",
       icon: UserPlus,
@@ -178,7 +164,7 @@ export async function UsersContent() {
                     </TableCell>
                     <TableCell className="text-right text-sm text-muted-foreground">
                       {member.updatedAt
-                        ? formatRelative(new Date(member.updatedAt))
+                        ? formatRelativeTime(new Date(member.updatedAt))
                         : "—"}
                     </TableCell>
                   </TableRow>

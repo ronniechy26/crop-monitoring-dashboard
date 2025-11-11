@@ -6,6 +6,9 @@ Next.js routes live in `app/` (public dashboard, crop drill-downs, admin, API). 
 ## Type Definitions
 All reusable domain/data contracts must be declared inside `types/` using domain-specific `.d.ts` modules (e.g., `types/user.d.ts`, `types/crop.d.ts`). Components, actions, and utilities should import from these files instead of redefining shared shapes inline. Component-only props/interfaces can stay colocated, but anything reused across modules moves under `types/`.
 
+## Reusable Functions
+Utility or formatting helpers that are shared between modules must live under `lib/` in descriptive files (e.g., `lib/date.ts`, `lib/format.ts`). Components and actions should import these helpers instead of copying logic inline; only component-specific handlers stay colocated.
+
 ## Action Layer Rules
 Every API call, Better Auth operation, or database transaction must live in the `action/` folder. Reads belong in `action/query`, writes/mutations in `action/mutation`. UI components, hooks, or route handlers should import these server actions instead of talking to `fetch`, Drizzle, or external SDKs directly. Keep each action focused (one responsibility, clear naming) and colocate related types alongside the action for easy reuse.
 
