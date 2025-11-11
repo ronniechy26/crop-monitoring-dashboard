@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { TableCell } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
@@ -310,53 +311,40 @@ export function UserActionsCell({
 
   return (
     <TableCell className="align-top text-right">
-      <div className="relative inline-block text-left">
-        <Button
-          type="button"
-          variant="subtle"
-          size="sm"
-          onClick={() => setPanelOpen((prev) => !prev)}
-          aria-expanded={panelOpen}
-        >
-          <MoreHorizontal className="h-4 w-4" />
-          Options
-        </Button>
-        {panelOpen ? (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              aria-hidden="true"
-              onClick={() => setPanelOpen(false)}
-            />
-            <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-border/70 bg-background/95 p-2 shadow-2xl backdrop-blur">
-              <div className="flex flex-col gap-1">
-                {availableActions.map((action) => {
-                  const Icon = action.icon;
-                  return (
-                    <Button
-                      key={action.modal}
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      disabled={action.disabled}
-                      className="justify-start"
-                      onClick={() =>
-                        action.disabled ? undefined : openModal(action.modal)
-                      }
-                    >
-                      <Icon className="mr-2 h-4 w-4" />
-                      {action.label}
-                    </Button>
-                  );
-                })}
-                {availableActions.length === 0 ? (
-                  <p className="px-3 py-2 text-xs text-muted-foreground">No actions available</p>
-                ) : null}
-              </div>
-            </div>
-          </>
-        ) : null}
-      </div>
+      <Popover open={panelOpen} onOpenChange={setPanelOpen}>
+        <PopoverTrigger asChild>
+          <Button type="button" variant="subtle" size="sm">
+            <MoreHorizontal className="h-4 w-4" />
+            Options
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end">
+          <div className="flex flex-col gap-1">
+            {availableActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Button
+                  key={action.modal}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={action.disabled}
+                  className="justify-start"
+                  onClick={() =>
+                    action.disabled ? undefined : openModal(action.modal)
+                  }
+                >
+                  <Icon className="mr-2 h-4 w-4" />
+                  {action.label}
+                </Button>
+              );
+            })}
+            {availableActions.length === 0 ? (
+              <p className="px-3 py-2 text-xs text-muted-foreground">No actions available</p>
+            ) : null}
+          </div>
+        </PopoverContent>
+      </Popover>
       {modalContent}
     </TableCell>
   );
