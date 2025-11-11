@@ -3,10 +3,14 @@ import { Suspense } from "react";
 import { UsersContent } from "@/components/admin/users-content";
 import { UsersSkeleton } from "@/components/admin/users-skeleton";
 
-export default function UsersPage() {
+interface UsersPageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+export default function UsersPage({ searchParams }: UsersPageProps) {
   return (
     <Suspense fallback={<UsersSkeleton />}>
-      <UsersContent />
+      <UsersContent searchParams={searchParams} />
     </Suspense>
   );
 }

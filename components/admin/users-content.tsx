@@ -1,10 +1,19 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Mail, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Mail,
+  ShieldCheck,
+  UserPlus,
+  UsersRound,
+} from "lucide-react";
 
 import { getSession } from "@/action/query/auth";
 import { getUsers } from "@/action/query/users";
 import { createUserMutation } from "@/action/mutation/users";
 import { AddUserButton } from "@/components/admin/add-user-button";
+import { UsersSearchForm } from "@/components/admin/users-search-form";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { AdminUser } from "@/types/user";
 import { formatRelativeTime } from "@/lib/format";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
@@ -27,43 +35,160 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
   minute: "2-digit",
 });
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const DEFAULT_USERS_PER_PAGE = 10;
+const PER_PAGE_OPTIONS = [10, 20, 30, 50];
 
-export async function UsersContent() {
-  const [session, users] = await Promise.all([getSession(), getUsers()]);
+type SessionRole = string | string[] | null | undefined;
+
+function normalizeRoles(value: SessionRole): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.filter((entry): entry is string => typeof entry === "string");
+  }
+  if (typeof value === "string") {
+    return value.split(",").map((role) => role.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function hasAdminSessionAccess(user: unknown) {
+  if (!user || typeof user !== "object") {
+    return false;
+  }
+  const candidate = user as {
+    role?: SessionRole;
+    roles?: SessionRole;
+    permissions?: string[];
+    admin?: boolean;
+    isAdmin?: boolean;
+  };
+  if (candidate.admin || candidate.isAdmin) {
+    return true;
+  }
+  const roles = [
+    ...normalizeRoles(candidate.role),
+    ...normalizeRoles(candidate.roles),
+  ];
+  if (roles.some((role) => role.toLowerCase() === "admin")) {
+    return true;
+  }
+  if (Array.isArray(candidate.permissions)) {
+    return candidate.permissions.some(
+      (permission) => typeof permission === "string" && permission.toLowerCase() === "admin",
+    );
+  }
+  return false;
+}
+
+interface UsersContentProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+export async function UsersContent({ searchParams = {} }: UsersContentProps) {
+  const searchValueRaw =
+    typeof searchParams.search === "string" ? searchParams.search.trim() : "";
+  const searchValue = searchValueRaw.length >= 3 ? searchValueRaw : "";
+  const requestedPage =
+    typeof searchParams.page === "string" ? Number(searchParams.page) : 1;
+  const requestedPerPage =
+    typeof searchParams.perPage === "string" ? Number(searchParams.perPage) : DEFAULT_USERS_PER_PAGE;
+
+  const session = await getSession();
   if (!session) {
     redirect("/admin/login");
   }
 
-  const totalUsers = users.length;
-  const verifiedCount = users.filter((user) => user.emailVerified).length;
-  const pendingVerification = totalUsers - verifiedCount;
+  const canViewUsers = hasAdminSessionAccess(session.user);
 
-  const now = new Date();
-  const recentSignups = users.filter((user) => {
-    const createdAt = user.createdAt ? new Date(user.createdAt) : null;
-    if (!createdAt) return false;
-    return now.getTime() - createdAt.getTime() <= SEVEN_DAYS_MS;
-  }).length;
+  const baseHeader = (
+    <div className="space-y-1">
+      <p className="text-sm text-muted-foreground">Admin / Users</p>
+      <h1 className="text-3xl font-semibold tracking-tight">User Management</h1>
+      <p className="text-sm text-muted-foreground">
+        Manage PhilSA and DA collaborators, resend invites, and review field agent status.
+      </p>
+    </div>
+  );
 
-  const lastUpdatedUser = users.reduce<AdminUser | null>((latest, user) => {
-    if (!user.updatedAt) return latest;
-    if (!latest || !latest.updatedAt) {
-      return user;
+  if (!canViewUsers) {
+    return (
+      <div className="space-y-8">
+        {baseHeader}
+        <Card className="border-dashed border-border/70 bg-card/40">
+          <CardHeader>
+            <CardTitle className="text-lg">Insufficient permissions</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Your current session lacks the Admin role required for this console view. Ask an administrator to update your Better Auth role, then refresh this page.
+            </p>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  const userResult = await getUsers({
+    search: searchValue,
+    page: requestedPage,
+    perPage: requestedPerPage,
+  });
+
+  if (!userResult.hasPermission) {
+    return (
+      <div className="space-y-8">
+        {baseHeader}
+        <Card className="border-dashed border-border/70 bg-card/40">
+          <CardHeader>
+            <CardTitle className="text-lg">Unable to load collaborators</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Better Auth rejected this request. Ensure your account is recognized as an admin (or added to `adminUserIds`) and try again.
+            </p>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  const { users, total, verifiedTotal, recentSignups, lastUpdatedUser, page, perPage } = userResult;
+  const pendingVerification = total - verifiedTotal;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
+  const end = total === 0 ? 0 : Math.min(total, page * perPage);
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+  const buildPageHref = (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (searchValue) {
+      params.set("search", searchValue);
     }
-    return user.updatedAt > latest.updatedAt ? user : latest;
-  }, null);
+    params.set("page", String(targetPage));
+    if (perPage && perPage !== DEFAULT_USERS_PER_PAGE) {
+      params.set("perPage", String(perPage));
+    }
+    const query = params.toString();
+    return query ? `/admin/users?${query}` : "/admin/users";
+  };
+  const prevHref = buildPageHref(Math.max(page - 1, 1));
+  const nextHref = buildPageHref(page + 1);
+  const lastUpdatedLabel = lastUpdatedUser?.updatedAt
+    ? formatRelativeTime(new Date(lastUpdatedUser.updatedAt))
+    : "—";
+  const lastUpdatedSubtext =
+    lastUpdatedUser?.name ?? lastUpdatedUser?.email ?? "No activity yet";
+
+  const perPageOptions = PER_PAGE_OPTIONS.includes(perPage)
+    ? PER_PAGE_OPTIONS
+    : [...PER_PAGE_OPTIONS, perPage].sort((a, b) => a - b);
 
   const cards = [
     {
       label: "Total users",
-      value: totalUsers,
+      value: total,
       subtext: "Synced from Better Auth",
       icon: UsersRound,
     },
     {
       label: "Verified accounts",
-      value: verifiedCount,
+      value: verifiedTotal,
       subtext: `${pendingVerification} pending verification`,
       icon: ShieldCheck,
     },
@@ -75,31 +200,62 @@ export async function UsersContent() {
     },
     {
       label: "Last update",
-      value: lastUpdatedUser?.updatedAt
-        ? formatRelativeTime(new Date(lastUpdatedUser.updatedAt))
-        : "—",
-      subtext: lastUpdatedUser?.name ?? "No activity yet",
+      value: lastUpdatedLabel,
+      subtext: lastUpdatedSubtext,
       icon: UserPlus,
     },
   ] as const;
 
+  const emptyStateMessage = searchValue
+    ? "No users match your search. Update your filters or invite someone new."
+    : "No users found. Use the Better Auth flow to add collaborators.";
+
+  const buildBaseParams = () => {
+    const params = new URLSearchParams();
+    if (searchValue) {
+      params.set("search", searchValue);
+    }
+    if (perPage && perPage !== DEFAULT_USERS_PER_PAGE) {
+      params.set("perPage", String(perPage));
+    }
+    return params;
+  };
+
+  const clearHref = (() => {
+    const params = buildBaseParams();
+    params.delete("search");
+    params.delete("page");
+    const query = params.toString();
+    return query ? `/admin/users?${query}` : "/admin/users";
+  })();
+
+  const header = (
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      {baseHeader}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <AddUserButton action={createUserMutation} />
+        <Button>
+          <UserPlus className="mr-2 h-4 w-4" />
+          Invite user
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">Admin / Users</p>
-          <h1 className="text-3xl font-semibold tracking-tight">User Management</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage PhilSA and DA collaborators, resend invites, and review field agent status.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <AddUserButton action={createUserMutation} />
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite user
-          </Button>
-        </div>
+      {header}
+
+      <div className="rounded-3xl border border-border/70 bg-card/40 p-4">
+        <UsersSearchForm
+          initialSearch={searchValueRaw}
+          perPage={perPage}
+          clearHref={clearHref}
+          hasActiveSearch={Boolean(searchValue)}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Showing {start}-{end} of {total} users
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -138,6 +294,7 @@ export async function UsersContent() {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Role</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Last update</TableHead>
                 </TableRow>
@@ -157,6 +314,9 @@ export async function UsersContent() {
                         {member.emailVerified ? "Verified" : "Pending"}
                       </Badge>
                     </TableCell>
+                    <TableCell className="text-sm text-muted-foreground capitalize">
+                      {member.role ?? "—"}
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {member.createdAt
                         ? dateTimeFormatter.format(new Date(member.createdAt))
@@ -171,14 +331,76 @@ export async function UsersContent() {
                 ))}
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="py-10 text-center text-sm text-muted-foreground">
-                      No users found. Use the Better Auth flow to add collaborators.
+                    <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
+                      {emptyStateMessage}
                     </TableCell>
                   </TableRow>
                 ) : null}
               </TableBody>
             </Table>
           </CardContent>
+          <div className="flex flex-col gap-4 border-t border-border/60 px-6 py-4 text-sm">
+            <div className="flex flex-col gap-3 text-xs text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                <p>
+                  Page {page} of {totalPages}
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {hasPrev ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={prevHref} className="flex items-center gap-1">
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" disabled>
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                  )}
+                  {hasNext ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={nextHref} className="flex items-center gap-1">
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" disabled>
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <form
+                action="/admin/users"
+                method="get"
+                className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground lg:justify-end"
+              >
+                <span className="font-semibold uppercase tracking-wide">Rows per page</span>
+                <select
+                  name="perPage"
+                  defaultValue={String(perPage)}
+                  className="rounded-xl border border-border/60 bg-background px-2 py-1 text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-ring/40"
+                >
+                  {perPageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                {searchValue ? (
+                  <input type="hidden" name="search" value={searchValue} />
+                ) : null}
+                <input type="hidden" name="page" value="1" />
+                <Button type="submit" size="sm" variant="ghost">
+                  Apply
+                </Button>
+              </form>
+            </div>
+          </div>
         </Card>
       </div>
     </div>

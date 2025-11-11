@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, UserPlus, X } from "lucide-react";
+import { Plus, ShieldCheck, UserPlus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -71,8 +71,27 @@ export function AddUserButton({ action }: AddUserButtonProps) {
                   placeholder="Minimum 8 characters"
                 />
               </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Role
+                </span>
+                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-3 py-2">
+                  <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                  <select
+                    name="role"
+                    defaultValue="user"
+                    className="flex-1 bg-transparent text-sm font-medium text-foreground outline-none"
+                  >
+                    <option value="user">Standard collaborator</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Admins can manage users and pipeline settings. Standard collaborators get dashboard access only.
+                </span>
+              </label>
               <p className="text-xs text-muted-foreground">
-                Credentials sync with Better Auth immediately. Ask the user to reset their password after first login.
+                Credentials sync with Better Auth immediately via the admin API. Ask the user to reset their password after first login.
               </p>
               <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="ghost" onClick={() => setOpen(false)}>

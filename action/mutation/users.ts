@@ -8,20 +8,22 @@ function extractFields(formData: FormData) {
   const name = (formData.get("name") as string | null)?.trim() ?? "";
   const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
   const password = (formData.get("password") as string | null) ?? "";
-  return { name, email, password };
+  const role = (formData.get("role") as string | null)?.trim() || "user";
+  return { name, email, password, role };
 }
 
 export async function createUserMutation(formData: FormData) {
-  const { name, email, password } = extractFields(formData);
+  const { name, email, password, role } = extractFields(formData);
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
 
-  await auth.api.signUpEmail({
+  await auth.api.createUser({
     body: {
       email,
       password,
       name: name,
+      role,
     },
   });
 

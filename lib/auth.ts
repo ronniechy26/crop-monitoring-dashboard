@@ -29,13 +29,9 @@ export const auth = betterAuth({
   },
   trustedOrigins: ["http://localhost:3000"],
   plugins: [
-    // haveIBeenPwned({
-    //   customPasswordCompromisedMessage: "Please choose a more secure password."
-    // }),
     nextCookies(),
     adminPlugin({
       adminRoles: ["admin"],
-      adminUserIds: [],
       ac,
       roles: {
         admin,

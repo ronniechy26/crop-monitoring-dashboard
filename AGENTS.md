@@ -9,6 +9,9 @@ All reusable domain/data contracts must be declared inside `types/` using domain
 ## Reusable Functions
 Utility or formatting helpers that are shared between modules must live under `lib/` in descriptive files (e.g., `lib/date.ts`, `lib/format.ts`). Components and actions should import these helpers instead of copying logic inline; only component-specific handlers stay colocated.
 
+## Request Headers
+When calling Better Auth server APIs (or any server-side helpers that expect session context), prefer `headers: await headers()` to forward the current request headers wholesale unless a call requires a narrower header set. This keeps requests aligned with Next.js streaming semantics and avoids dropped auth/session state.
+
 ## Action Layer Rules
 Every API call, Better Auth operation, or database transaction must live in the `action/` folder. Reads belong in `action/query`, writes/mutations in `action/mutation`. UI components, hooks, or route handlers should import these server actions instead of talking to `fetch`, Drizzle, or external SDKs directly. Keep each action focused (one responsibility, clear naming) and colocate related types alongside the action for easy reuse.
 
