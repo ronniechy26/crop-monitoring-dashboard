@@ -1,11 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { emailOTP } from "better-auth/plugins";
+import { emailOTP, admin as adminPlugin } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 
 import * as authSchema from "@/auth-schema";
 import { db } from "@/lib/db";
+import { ac, admin, user } from "@/lib/permissions";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set. Add it to your environment to use Better Auth.");
@@ -32,6 +33,15 @@ export const auth = betterAuth({
     //   customPasswordCompromisedMessage: "Please choose a more secure password."
     // }),
     nextCookies(),
+    adminPlugin({
+      adminRoles: ["admin"],
+      adminUserIds: [],
+      ac,
+      roles: {
+        admin,
+        user,
+      },
+    }),
     emailOTP({
       overrideDefaultEmailVerification: false,
       otpLength: 6,
