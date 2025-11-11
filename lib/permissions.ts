@@ -2,7 +2,7 @@ import { createAccessControl } from "better-auth/plugins/access";
 
 export const statement = {
   pipeline: ["create", "read", "update", "delete"],
-  user: ["ban", "create", "read", "update", "impersonate"],
+  user: ["ban", "list" ,"create", "read", "update", "impersonate"],
   settings: ["create", "read", "update", "delete"],
   dashboard: ["read"]
 } as const;
@@ -15,7 +15,7 @@ export const user = ac.newRole({
 
 export const admin = ac.newRole({
   pipeline: ["create", "read", "update", "delete"],
-  user: ["ban", "create", "read", "update", "impersonate"],
+  user: ["ban", "list", "create", "read", "update", "impersonate"],
   settings: ["create", "read", "update", "delete"],
   dashboard: ["read"]
 });

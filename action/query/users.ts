@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import type { AdminUser, AdminUserListParams, AdminUserListResult } from "@/types/user";
@@ -58,12 +58,14 @@ export async function getUsers(params: AdminUserListParams = {}): Promise<AdminU
 
   const recentSinceIso = new Date(Date.now() - SEVEN_DAYS_MS).toISOString();
 
-  const listUsers = async (query: Record<string, unknown>) => {
-    return auth.api.listUsers({
+  const headerEntries = Array.from((await headers()).entries());
+  const requestHeaders = Object.fromEntries(headerEntries);
+
+  const listUsers = (query: Record<string, unknown>) =>
+    auth.api.listUsers({
       query,
-      headers: await headers(),
+      headers: requestHeaders,
     });
-  };
 
   try {
     const [primary, verified, recent, lastUpdated] = await Promise.all([
@@ -109,7 +111,6 @@ export async function getUsers(params: AdminUserListParams = {}): Promise<AdminU
       lastUpdatedUser,
       page,
       perPage,
-      hasPermission: true,
     };
   } catch (error) {
     if (isPermissionError(error)) {
@@ -121,7 +122,6 @@ export async function getUsers(params: AdminUserListParams = {}): Promise<AdminU
         lastUpdatedUser: null,
         page,
         perPage,
-        hasPermission: false,
       };
     }
     throw error;

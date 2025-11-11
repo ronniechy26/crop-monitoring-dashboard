@@ -23,5 +23,4 @@ export interface AdminUserListResult {
   lastUpdatedUser: AdminUser | null;
   page: number;
   perPage: number;
-  hasPermission: boolean;
 }

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { getSession } from "@/action/query/auth";
+import { hasPermission } from "@/action/query/permissions";
 import { getUsers } from "@/action/query/users";
 import { createUserMutation } from "@/action/mutation/users";
 import { AddUserButton } from "@/components/admin/add-user-button";
@@ -38,48 +39,6 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
 const DEFAULT_USERS_PER_PAGE = 10;
 const PER_PAGE_OPTIONS = [10, 20, 30, 50];
 
-type SessionRole = string | string[] | null | undefined;
-
-function normalizeRoles(value: SessionRole): string[] {
-  if (!value) return [];
-  if (Array.isArray(value)) {
-    return value.filter((entry): entry is string => typeof entry === "string");
-  }
-  if (typeof value === "string") {
-    return value.split(",").map((role) => role.trim()).filter(Boolean);
-  }
-  return [];
-}
-
-function hasAdminSessionAccess(user: unknown) {
-  if (!user || typeof user !== "object") {
-    return false;
-  }
-  const candidate = user as {
-    role?: SessionRole;
-    roles?: SessionRole;
-    permissions?: string[];
-    admin?: boolean;
-    isAdmin?: boolean;
-  };
-  if (candidate.admin || candidate.isAdmin) {
-    return true;
-  }
-  const roles = [
-    ...normalizeRoles(candidate.role),
-    ...normalizeRoles(candidate.roles),
-  ];
-  if (roles.some((role) => role.toLowerCase() === "admin")) {
-    return true;
-  }
-  if (Array.isArray(candidate.permissions)) {
-    return candidate.permissions.some(
-      (permission) => typeof permission === "string" && permission.toLowerCase() === "admin",
-    );
-  }
-  return false;
-}
-
 interface UsersContentProps {
   searchParams?: Record<string, string | string[] | undefined>;
 }
@@ -93,12 +52,14 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
   const requestedPerPage =
     typeof searchParams.perPage === "string" ? Number(searchParams.perPage) : DEFAULT_USERS_PER_PAGE;
 
-  const session = await getSession();
+  const [session, canListUsers, canCreateUsers] = await Promise.all([
+    getSession(),
+    hasPermission({ user: ["list"] }),
+    hasPermission({ user: ["create"] }),
+  ]);
   if (!session) {
     redirect("/admin/login");
   }
-
-  const canViewUsers = hasAdminSessionAccess(session.user);
 
   const baseHeader = (
     <div className="space-y-1">
@@ -110,7 +71,7 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
     </div>
   );
 
-  if (!canViewUsers) {
+  if (!canListUsers) {
     return (
       <div className="space-y-8">
         {baseHeader}
@@ -118,7 +79,7 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
           <CardHeader>
             <CardTitle className="text-lg">Insufficient permissions</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Your current session lacks the Admin role required for this console view. Ask an administrator to update your Better Auth role, then refresh this page.
+              This view requires the `user:list` permission from your Better Auth session. Ask an administrator to update your access control configuration, then refresh this page.
             </p>
           </CardHeader>
         </Card>
@@ -131,22 +92,6 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
     page: requestedPage,
     perPage: requestedPerPage,
   });
-
-  if (!userResult.hasPermission) {
-    return (
-      <div className="space-y-8">
-        {baseHeader}
-        <Card className="border-dashed border-border/70 bg-card/40">
-          <CardHeader>
-            <CardTitle className="text-lg">Unable to load collaborators</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Better Auth rejected this request. Ensure your account is recognized as an admin (or added to `adminUserIds`) and try again.
-            </p>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
 
   const { users, total, verifiedTotal, recentSignups, lastUpdatedUser, page, perPage } = userResult;
   const pendingVerification = total - verifiedTotal;
@@ -232,13 +177,15 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
   const header = (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       {baseHeader}
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <AddUserButton action={createUserMutation} />
-        <Button>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Invite user
-        </Button>
-      </div>
+      {canCreateUsers ? (
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <AddUserButton action={createUserMutation} />
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Invite user
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 
