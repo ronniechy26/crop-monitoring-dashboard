@@ -1,5 +1,3 @@
-"use client";
-
 function SkeletonStrip({ className }: { className: string }) {
   return <div className={`animate-pulse rounded-xl bg-muted ${className}`} />;
 }
