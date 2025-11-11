@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CropMetrics } from "@/lib/crop-data";
+import type { CropMetrics } from "@/types/crop";
 
 interface CropDataTableProps {
   metrics: CropMetrics;

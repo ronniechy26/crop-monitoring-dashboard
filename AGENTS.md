@@ -3,6 +3,9 @@
 ## Project Structure & Module Organization
 Next.js routes live in `app/` (public dashboard, crop drill-downs, admin, API). Components sit in `components/`, shared utilities in `lib/`, server actions in `action/query` and `action/mutation`, and PhilSA-derived GeoJSON summaries reside in `data/`. Types belong in `types/`, global styles in `app/globals.css`, and assets stay in `public/`.
 
+## Type Definitions
+All reusable domain/data contracts must be declared inside `types/` using domain-specific `.d.ts` modules (e.g., `types/user.d.ts`, `types/crop.d.ts`). Components, actions, and utilities should import from these files instead of redefining shared shapes inline. Component-only props/interfaces can stay colocated, but anything reused across modules moves under `types/`.
+
 ## Action Layer Rules
 Every API call, Better Auth operation, or database transaction must live in the `action/` folder. Reads belong in `action/query`, writes/mutations in `action/mutation`. UI components, hooks, or route handlers should import these server actions instead of talking to `fetch`, Drizzle, or external SDKs directly. Keep each action focused (one responsibility, clear naming) and colocate related types alongside the action for easy reuse.
 

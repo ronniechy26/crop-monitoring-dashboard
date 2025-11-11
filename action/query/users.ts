@@ -3,8 +3,9 @@ import { desc } from "drizzle-orm";
 
 import { user as userTable } from "@/auth-schema";
 import { db } from "@/lib/db";
+import type { AdminUser } from "@/types/user";
 
-export const getUsers = cache(async () => {
+export const getUsers = cache(async (): Promise<AdminUser[]> => {
   return db
     .select({
       id: userTable.id,

@@ -19,7 +19,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type { CropMetrics } from "@/lib/crop-data";
+import type { CropMetrics } from "@/types/crop";
 
 import { KpiCard } from "./kpi-card";
 import { TrendCard } from "./trend-card";

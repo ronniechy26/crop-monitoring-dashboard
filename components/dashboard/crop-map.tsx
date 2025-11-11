@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { CropFeature } from "@/lib/crop-data";
+import type { CropFeature } from "@/types/crop";
 import { formatMonthLabel } from "@/lib/format";
 interface CropMapProps {
   cropName: string;

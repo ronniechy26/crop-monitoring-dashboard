@@ -5,7 +5,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { CropMetrics } from "@/lib/crop-data";
+import type { CropMetrics } from "@/types/crop";
 
 interface MiniChartCardProps {
   metrics: CropMetrics;

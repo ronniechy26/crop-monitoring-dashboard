@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-import type { TimeseriesPoint } from "@/lib/crop-data";
+import type { TimeseriesPoint } from "@/types/crop";
 
 interface CropPerformanceChartProps {
   data: TimeseriesPoint[];

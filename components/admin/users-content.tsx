@@ -3,7 +3,7 @@ import { Mail, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 
 import { getSession } from "@/action/query/auth";
 import { getUsers } from "@/action/query/users";
-import { createUserMutation, inviteUserMutation } from "@/action/mutation/users";
+import { createUserMutation } from "@/action/mutation/users";
 import { AddUserButton } from "@/components/admin/add-user-button";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { AdminUser } from "@/types/user";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
   month: "short",
@@ -59,7 +60,7 @@ export async function UsersContent() {
     return now.getTime() - createdAt.getTime() <= SEVEN_DAYS_MS;
   }).length;
 
-  const lastUpdatedUser = users.reduce<(typeof users)[number] | null>((latest, user) => {
+  const lastUpdatedUser = users.reduce<AdminUser | null>((latest, user) => {
     if (!user.updatedAt) return latest;
     if (!latest || !latest.updatedAt) {
       return user;
@@ -107,7 +108,7 @@ export async function UsersContent() {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <AddUserButton action={createUserMutation} inviteAction={inviteUserMutation} />
+          <AddUserButton action={createUserMutation} />
           <Button>
             <UserPlus className="mr-2 h-4 w-4" />
             Invite user
