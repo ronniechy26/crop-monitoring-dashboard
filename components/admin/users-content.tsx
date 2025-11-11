@@ -263,6 +263,7 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
                   <TableHead>User</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Access</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Last update</TableHead>
                   {showUserActions ? <TableHead className="text-right">Options</TableHead> : null}
@@ -285,6 +286,17 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground capitalize">
                       {member.role ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      {member.banned ? (
+                        <span className="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                          Banned
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          Active
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {member.createdAt

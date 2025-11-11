@@ -1,13 +1,25 @@
 "use client";
 
-import { useState, type ComponentType, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Ban, Eye, MoreHorizontal, Pencil, ShieldCheck, Trash2, UserCheck, X } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TableCell } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import type { AdminUser } from "@/types/user";
 
 const INPUT_STYLES =
@@ -59,6 +71,12 @@ export function UserActionsCell({
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const isCurrentUser = sessionUserId === member.id;
   const displayName = member.name ?? member.email;
+  const editFormId = useId();
+  const roleFormId = useId();
+  const banFormId = useId();
+  const unbanFormId = useId();
+  const impersonateFormId = useId();
+  const deleteFormId = useId();
 
   const availableActions = [
     canUpdateUsers && { label: "Edit user", icon: Pencil, modal: "edit" as const },
@@ -99,11 +117,9 @@ export function UserActionsCell({
             title={`Edit ${displayName}`}
             description="Update profile details synced with Better Auth."
             onClose={closeModal}
-            icon={Pencil}
-            accent="info"
             {...sharedProps}
           >
-            <form action={updateUserAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={editFormId} action={updateUserAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <label className="space-y-1 text-sm">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -130,7 +146,13 @@ export function UserActionsCell({
                   required
                 />
               </label>
-              <ModalActions submitLabel="Save changes" onCancel={closeModal} />
+              <ModalActions
+                formId={editFormId}
+                submitLabel="Save changes"
+                onCancel={closeModal}
+                confirmTitle="Apply profile updates?"
+                confirmDescription="These changes sync immediately across the admin console."
+              />
             </form>
           </ActionModal>
         );
@@ -142,14 +164,18 @@ export function UserActionsCell({
             title="Set role"
             description="Assign comma-separated roles. Permissions sync immediately."
             onClose={closeModal}
-            icon={ShieldCheck}
-            accent="primary"
             {...sharedProps}
           >
-            <form action={setRoleAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={roleFormId} action={setRoleAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <RoleChecklist roleOptions={roleOptions} selectedRoles={member.role} />
-              <ModalActions submitLabel="Update role" onCancel={closeModal} />
+              <ModalActions
+                formId={roleFormId}
+                submitLabel="Update role"
+                onCancel={closeModal}
+                confirmTitle="Change user roles?"
+                confirmDescription="Updated roles determine what this collaborator can access."
+              />
             </form>
           </ActionModal>
         );
@@ -161,11 +187,9 @@ export function UserActionsCell({
             title="Ban user"
             description="Revokes all sessions and blocks sign-in until lifted."
             onClose={closeModal}
-            icon={Ban}
-            accent="destructive"
             {...sharedProps}
           >
-            <form action={banUserAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={banFormId} action={banUserAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <label className="space-y-1 text-sm">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -190,7 +214,14 @@ export function UserActionsCell({
                   ))}
                 </select>
               </label>
-              <ModalActions submitLabel={`Ban ${displayName}`} onCancel={closeModal} destructive />
+              <ModalActions
+                formId={banFormId}
+                submitLabel={`Ban ${displayName}`}
+                onCancel={closeModal}
+                destructive
+                confirmTitle="Confirm ban"
+                confirmDescription={`This immediately signs out ${displayName} and blocks further logins until unbanned.`}
+              />
             </form>
           </ActionModal>
         );
@@ -202,17 +233,21 @@ export function UserActionsCell({
             title="Unban user"
             description="Restores access and allows new sessions."
             onClose={closeModal}
-            icon={UserCheck}
-            accent="success"
             {...sharedProps}
           >
-            <form action={unbanUserAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={unbanFormId} action={unbanUserAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <p className="text-sm text-muted-foreground">
                 {displayName} was banned{member.banReason ? ` for "${member.banReason}"` : ""}. Proceed
                 to reinstate their access?
               </p>
-              <ModalActions submitLabel="Unban user" onCancel={closeModal} />
+              <ModalActions
+                formId={unbanFormId}
+                submitLabel="Unban user"
+                onCancel={closeModal}
+                confirmTitle="Restore access?"
+                confirmDescription={`Allow ${displayName} to sign in again and create new sessions.`}
+              />
             </form>
           </ActionModal>
         );
@@ -224,16 +259,20 @@ export function UserActionsCell({
             title="Impersonate user"
             description="Creates a temporary session as this user for troubleshooting."
             onClose={closeModal}
-            icon={Eye}
-            accent="neutral"
             {...sharedProps}
           >
-            <form action={impersonateUserAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={impersonateFormId} action={impersonateUserAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <p className="text-sm text-muted-foreground">
                 You will remain impersonating until you stop the session or the timer expires.
               </p>
-              <ModalActions submitLabel={`Impersonate ${displayName}`} onCancel={closeModal} />
+              <ModalActions
+                formId={impersonateFormId}
+                submitLabel={`Impersonate ${displayName}`}
+                onCancel={closeModal}
+                confirmTitle="Start impersonation?"
+                confirmDescription="You will switch to this account until you stop impersonating."
+              />
             </form>
           </ActionModal>
         );
@@ -245,16 +284,21 @@ export function UserActionsCell({
             title="Delete user"
             description="This permanently removes the account from Better Auth."
             onClose={closeModal}
-            icon={Trash2}
-            accent="destructive"
             {...sharedProps}
           >
-            <form action={deleteUserAction} className="space-y-4" onSubmit={closeModal}>
+            <form id={deleteFormId} action={deleteUserAction} className="space-y-4" onSubmit={closeModal}>
               {baseFields}
               <p className="text-sm text-muted-foreground">
                 This action cannot be undone. Please confirm you want to delete {displayName}.
               </p>
-              <ModalActions submitLabel="Delete user" onCancel={closeModal} destructive />
+              <ModalActions
+                formId={deleteFormId}
+                submitLabel="Delete user"
+                onCancel={closeModal}
+                destructive
+                confirmTitle="Delete this account?"
+                confirmDescription="This removes the user and all related Better Auth records permanently."
+              />
             </form>
           </ActionModal>
         );
@@ -325,15 +369,11 @@ interface ActionModalProps {
   onClose: () => void;
 }
 
-type Accent = "primary" | "info" | "neutral" | "destructive" | "success";
-
 interface ActionModalProps {
   title: string;
   description?: string;
   children: ReactNode;
   onClose: () => void;
-  icon?: ComponentType<{ className?: string }>;
-  accent?: Accent;
   user: AdminUser;
 }
 
@@ -342,37 +382,18 @@ function ActionModal({
   description,
   children,
   onClose,
-  icon: Icon,
-  accent = "primary",
   user,
 }: ActionModalProps) {
-  const accentClasses: Record<Accent, { badge: string; title: string }> = {
-    primary: { badge: "bg-indigo-100 text-indigo-700", title: "text-indigo-900" },
-    info: { badge: "bg-sky-100 text-sky-700", title: "text-sky-900" },
-    neutral: { badge: "bg-slate-100 text-slate-700", title: "text-slate-900" },
-    destructive: { badge: "bg-rose-100 text-rose-700", title: "text-rose-900" },
-    success: { badge: "bg-emerald-100 text-emerald-700", title: "text-emerald-900" },
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 py-6">
       <div className="w-full max-w-2xl overflow-hidden rounded-3xl border border-border/70 bg-background shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border/70 bg-card/60 px-6 py-4">
-          <div className="flex items-center gap-3">
-            {Icon ? (
-              <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${accentClasses[accent].badge}`}>
-                <Icon className="h-5 w-5" />
-              </span>
+        <div className="flex items-center justify-between border-b border-border/70 bg-card px-6 py-4">
+          <div className="text-left">
+            <p className="text-sm text-muted-foreground">Admin / Users</p>
+            <p className="text-lg font-semibold text-foreground">{title}</p>
+            {description ? (
+              <p className="text-sm text-muted-foreground">{description}</p>
             ) : null}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                User action
-              </p>
-              <p className={`text-lg font-semibold ${accentClasses[accent].title}`}>{title}</p>
-              {description ? (
-                <p className="text-sm text-muted-foreground">{description}</p>
-              ) : null}
-            </div>
           </div>
           <Button type="button" variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -390,7 +411,7 @@ function ActionModal({
 
 function UserSummary({ user }: { user: AdminUser }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/40 p-4">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left">
       <div className="flex items-center gap-4">
         <Avatar
           initials={(user.name ?? user.email).slice(0, 2).toUpperCase()}
@@ -425,21 +446,56 @@ interface ModalActionsProps {
   submitLabel: string;
   destructive?: boolean;
   onCancel: () => void;
+  formId: string;
+  confirmTitle?: string;
+  confirmDescription?: string;
 }
 
-function ModalActions({ submitLabel, destructive = false, onCancel }: ModalActionsProps) {
+function ModalActions({
+  submitLabel,
+  destructive = false,
+  onCancel,
+  formId,
+  confirmTitle = "Are you sure?",
+  confirmDescription = "This action cannot be undone.",
+}: ModalActionsProps) {
   return (
-    <div className="flex flex-col gap-2 pt-4 sm:flex-row sm:justify-end">
-      <Button type="button" variant="ghost" onClick={onCancel} className="sm:min-w-[120px]">
+    <div className="flex flex-col gap-2 pt-4 text-right sm:flex-row sm:justify-end sm:text-right">
+      <Button type="button" variant="outline" onClick={onCancel} className="sm:min-w-[120px]">
         Cancel
       </Button>
-      <Button
-        type="submit"
-        variant={destructive ? "destructive" : "default"}
-        className="sm:min-w-[150px]"
-      >
-        {submitLabel}
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            type="button"
+            variant={destructive ? "destructive" : "default"}
+            className="sm:min-w-[150px]"
+          >
+            {submitLabel}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
+            {confirmDescription ? (
+              <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
+            ) : null}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Nevermind</AlertDialogCancel>
+            <AlertDialogAction
+              form={formId}
+              type="submit"
+              className={cn(
+                buttonVariants({ variant: destructive ? "destructive" : "default" }),
+                "sm:min-w-[140px]",
+              )}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -470,7 +526,7 @@ function RoleChecklist({ roleOptions, selectedRoles }: RoleChecklistProps) {
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Assign roles
       </p>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 text-left sm:grid-cols-2">
         {roleOptions.map((role) => {
           const display = role.charAt(0).toUpperCase() + role.slice(1);
           const checked = selectedSet.has(role);
