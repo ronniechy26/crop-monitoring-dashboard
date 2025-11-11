@@ -1,20 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Mail,
-  ShieldCheck,
-  UserPlus,
-  UsersRound,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 
 import { getSession } from "@/action/query/auth";
 import { hasPermission } from "@/action/query/permissions";
 import { getUsers } from "@/action/query/users";
-import { createUserMutation } from "@/action/mutation/users";
+import {
+  banUserMutation,
+  createUserMutation,
+  deleteUserMutation,
+  impersonateUserMutation,
+  setUserRoleMutation,
+  unbanUserMutation,
+  updateUserMutation,
+} from "@/action/mutation/users";
 import { AddUserButton } from "@/components/admin/add-user-button";
 import { UsersSearchForm } from "@/components/admin/users-search-form";
+import { UserActionsCell } from "@/components/admin/user-actions-cell";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatRelativeTime } from "@/lib/format";
+import { availableRoles } from "@/lib/permissions";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
   month: "short",
@@ -52,14 +55,31 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
   const requestedPerPage =
     typeof searchParams.perPage === "string" ? Number(searchParams.perPage) : DEFAULT_USERS_PER_PAGE;
 
-  const [session, canListUsers, canCreateUsers] = await Promise.all([
+  const [
+    session,
+    canListUsers,
+    canCreateUsers,
+    canUpdateUsers,
+    canDeleteUsers,
+    canBanUsers,
+    canImpersonateUsers,
+    canSetRoles,
+  ] = await Promise.all([
     getSession(),
     hasPermission({ user: ["list"] }),
     hasPermission({ user: ["create"] }),
+    hasPermission({ user: ["update"] }),
+    hasPermission({ user: ["delete"] }),
+    hasPermission({ user: ["ban"] }),
+    hasPermission({ user: ["impersonate"] }),
+    hasPermission({ user: ["set-role"] }),
   ]);
   if (!session) {
     redirect("/admin/login");
   }
+  const showUserActions =
+    canUpdateUsers || canDeleteUsers || canBanUsers || canImpersonateUsers || canSetRoles;
+  const sessionUserId = session?.user?.id;
 
   const baseHeader = (
     <div className="space-y-1">
@@ -154,6 +174,7 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
   const emptyStateMessage = searchValue
     ? "No users match your search. Update your filters or invite someone new."
     : "No users found. Use the Better Auth flow to add collaborators.";
+  const totalTableColumns = showUserActions ? 6 : 5;
 
   const buildBaseParams = () => {
     const params = new URLSearchParams();
@@ -244,6 +265,7 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
                   <TableHead>Role</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Last update</TableHead>
+                  {showUserActions ? <TableHead className="text-right">Options</TableHead> : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -274,11 +296,29 @@ export async function UsersContent({ searchParams = {} }: UsersContentProps) {
                         ? formatRelativeTime(new Date(member.updatedAt))
                         : "—"}
                     </TableCell>
+                    {showUserActions ? (
+                      <UserActionsCell
+                        member={member}
+                        canUpdateUsers={canUpdateUsers}
+                        canDeleteUsers={canDeleteUsers}
+                        canBanUsers={canBanUsers}
+                        canImpersonateUsers={canImpersonateUsers}
+                        canSetRoles={canSetRoles}
+                        sessionUserId={sessionUserId}
+                        roleOptions={availableRoles}
+                        updateUserAction={updateUserMutation}
+                        setRoleAction={setUserRoleMutation}
+                        banUserAction={banUserMutation}
+                        unbanUserAction={unbanUserMutation}
+                        deleteUserAction={deleteUserMutation}
+                        impersonateUserAction={impersonateUserMutation}
+                      />
+                    ) : null}
                   </TableRow>
                 ))}
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={totalTableColumns} className="py-10 text-center text-sm text-muted-foreground">
                       {emptyStateMessage}
                     </TableCell>
                   </TableRow>

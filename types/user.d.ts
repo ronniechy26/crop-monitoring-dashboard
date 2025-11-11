@@ -7,6 +7,9 @@ export interface AdminUser {
   createdAt: string | Date | null;
   updatedAt: string | Date | null;
   role: string | null;
+  banned: boolean;
+  banReason: string | null;
+  banExpiresAt: string | Date | null;
 }
 
 export interface AdminUserListParams {

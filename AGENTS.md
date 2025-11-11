@@ -34,6 +34,9 @@ Any crop extent or indicator not yet defined inside `data/` must be ingested int
 ## Coding Style & Naming Conventions
 Stick to strict TypeScript, 2-space indentation, PascalCase components/hooks, camelCase helpers, and `verbNoun` server actions. Use the `@/*` alias and resolve lint with `npm run lint` (or `npx eslint file --fix`) before pushing.
 
+## UI Components
+Prefer the existing Shadcn UI primitives (`@/components/ui/*`) when building or extending interface elements. Only introduce bespoke patterns when a Shadcn component cannot cover the use case, and align new pieces with the same design tokens/spacing system.
+
 ## Testing Guidelines
 Automated tests are pending; rely on linting plus manual verification in `npm run dev`. When Jest/Vitest/Playwright arrive, colocate `*.test.tsx`, mock Drizzle/PostGIS calls, and cover empty layers, NDVI alerts, and auth gating.
 

@@ -75,13 +75,13 @@ export default async function DataPipelinePage() {
             <div>
               <p className="text-xs uppercase text-muted-foreground">Enable PostGIS</p>
               <pre className="mt-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground">
-                psql $DATABASE_URL -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+                psql $DATABASE_URL -c &quot;CREATE EXTENSION IF NOT EXISTS postgis;&quot;
               </pre>
             </div>
             <div>
               <p className="text-xs uppercase text-muted-foreground">Load GeoJSON</p>
               <pre className="mt-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground">
-                ogr2ogr -f PostgreSQL PG:"$DATABASE_URL" data/corn.geojson \
+                ogr2ogr -f PostgreSQL PG:&quot;$DATABASE_URL&quot; data/corn.geojson \
                 -nln crops.corn_fields -nlt MULTIPOLYGON -overwrite
               </pre>
             </div>
@@ -112,7 +112,7 @@ export default async function DataPipelinePage() {
             <div className="rounded-2xl border border-border/60 p-4">
               <p className="text-xs uppercase">Cache refresh</p>
               <p className="mt-2">
-                After loading new metrics, call `revalidatePath("/admin")` and `/` to stream updated stats through PPR.
+                After loading new metrics, call `revalidatePath(&quot;/admin&quot;)` and `/` to stream updated stats through PPR.
               </p>
             </div>
             <div className="rounded-2xl border border-border/60 p-4">

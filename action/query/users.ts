@@ -20,6 +20,9 @@ function normalizeUser(user: ListUsersResponse["users"][number]): AdminUser {
     createdAt: user.createdAt ?? null,
     updatedAt: user.updatedAt ?? null,
     role: Array.isArray(user.role) ? user.role.join(", ") : user.role ?? null,
+    banned: Boolean(user.banned),
+    banReason: user.banReason ?? null,
+    banExpiresAt: user.banExpires ?? null,
   };
 }
 
