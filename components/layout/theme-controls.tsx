@@ -55,7 +55,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={resolvedMode === "light" && mode !== "system" ? "accent" : "ghost"}
+          variant={resolvedMode === "light" && mode !== "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Activate light mode"
           onClick={() => setMode("light")}
@@ -65,7 +65,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={mode === "system" ? "accent" : "ghost"}
+          variant={mode === "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Follow system appearance"
           onClick={() => setMode("system")}
@@ -75,7 +75,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={resolvedMode === "dark" && mode !== "system" ? "accent" : "ghost"}
+          variant={resolvedMode === "dark" && mode !== "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Activate dark mode"
           onClick={() => setMode("dark")}
@@ -125,7 +125,7 @@ export function ThemeControls({
             <Button
               type="button"
               size="sm"
-              variant={sidebarPosition === "sidebar" ? "accent" : "outline"}
+              variant={sidebarPosition === "sidebar" ? "default" : "outline"}
               className={cn(
                 "rounded-full text-xs",
                 sidebarPosition === "sidebar" && "shadow-sm",
@@ -138,7 +138,7 @@ export function ThemeControls({
             <Button
               type="button"
               size="sm"
-              variant={sidebarPosition === "navbar" ? "accent" : "outline"}
+              variant={sidebarPosition === "navbar" ? "default" : "outline"}
               className={cn(
                 "rounded-full text-xs",
                 sidebarPosition === "navbar" && "shadow-sm",

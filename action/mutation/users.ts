@@ -4,12 +4,29 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
+import { availableRoles } from "@/lib/permissions";
+
+type Role = (typeof availableRoles)[number];
+
+const validRoles = new Set<Role>(availableRoles);
+
+function isRole(value: string): value is Role {
+  return validRoles.has(value as Role);
+}
+
+function normalizeRoles(values: string[]): Role[] {
+  const normalized = values
+    .map((value) => value.trim())
+    .filter(isRole);
+  return Array.from(new Set(normalized));
+}
 
 function extractFields(formData: FormData) {
   const name = (formData.get("name") as string | null)?.trim() ?? "";
   const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
   const password = (formData.get("password") as string | null) ?? "";
-  const role = (formData.get("role") as string | null)?.trim() || "user";
+  const roleInput = (formData.get("role") as string | null)?.trim() || "user";
+  const role = isRole(roleInput) ? roleInput : "user";
   return { name, email, password, role };
 }
 
@@ -21,14 +38,11 @@ function requireUserId(formData: FormData) {
   return userId;
 }
 
-function parseRoleInput(roleInput: string | null) {
+function parseRoleInput(roleInput: string | null): Role | Role[] | null {
   if (!roleInput) {
     return null;
   }
-  const values = roleInput
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
+  const values = normalizeRoles(roleInput.split(","));
   if (values.length === 0) {
     return null;
   }
@@ -102,11 +116,10 @@ export async function updateUserMutation(formData: FormData) {
 
 export async function setUserRoleMutation(formData: FormData) {
   const userId = requireUserId(formData);
-  const rolesFromCheckboxes = formData
-    .getAll("role")
-    .map((value) => (typeof value === "string" ? value.trim() : ""))
-    .filter(Boolean);
-  let parsedRole: string | string[] | null = null;
+  const rolesFromCheckboxes = normalizeRoles(
+    formData.getAll("role").map((value) => (typeof value === "string" ? value : ""))
+  );
+  let parsedRole: Role | Role[] | null = null;
   if (rolesFromCheckboxes.length > 0) {
     parsedRole = rolesFromCheckboxes.length === 1 ? rolesFromCheckboxes[0] : rolesFromCheckboxes;
   } else {

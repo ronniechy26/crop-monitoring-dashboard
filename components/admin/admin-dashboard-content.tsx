@@ -308,13 +308,13 @@ export async function AdminDashboardContent() {
             <CardTitle>Quick actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full" variant="subtle">
+            <Button className="w-full" variant="outline">
               Sync latest satellite pass
             </Button>
-            <Button className="w-full" variant="subtle">
+            <Button className="w-full" variant="outline">
               Export barangay shapefile
             </Button>
-            <Button className="w-full" variant="subtle">
+            <Button className="w-full" variant="outline">
               Notify provincial LGU
             </Button>
           </CardContent>

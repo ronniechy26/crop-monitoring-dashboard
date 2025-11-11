@@ -313,7 +313,7 @@ export function UserActionsCell({
     <TableCell className="align-top text-right">
       <Popover open={panelOpen} onOpenChange={setPanelOpen}>
         <PopoverTrigger asChild>
-          <Button type="button" variant="subtle" size="sm">
+          <Button type="button" variant="outline" size="sm">
             <MoreHorizontal className="h-4 w-4" />
             Options
           </Button>
