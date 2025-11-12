@@ -16,6 +16,7 @@ export const statement = {
   ],
   settings: ["create", "read", "update", "delete"],
   dashboard: ["read"],
+  logs: ["list", "read"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -42,4 +43,45 @@ export const admin = ac.newRole({
   ],
   settings: ["create", "read", "update", "delete"],
   dashboard: ["read"],
+  logs: ["list", "read"],
 });
+
+const ROLE_REGISTRY = {
+  admin,
+  user,
+} as const;
+
+type Statement = typeof statement;
+type Resource = keyof Statement;
+type ActionFor<R extends Resource> = Statement[R][number];
+
+export function hasPermission<R extends Resource>(
+  roleInput: string | string[] | null | undefined,
+  resource: R,
+  action: ActionFor<R>
+): boolean {
+  if (!roleInput) {
+    return false;
+  }
+  const normalized = Array.isArray(roleInput) ? roleInput : [roleInput];
+  return normalized.some((roleName) => {
+    const role = ROLE_REGISTRY[roleName as keyof typeof ROLE_REGISTRY];
+    if (!role) {
+      return false;
+    }
+    return role.authorize({ [resource]: [action] }).success;
+  });
+}
+
+export function requirePermission<R extends Resource>(
+  roleInput: string | string[] | null | undefined,
+  resource: R,
+  action: ActionFor<R>
+) {
+  if (hasPermission(roleInput, resource, action)) {
+    return;
+  }
+  const error = new Error("You do not have permission to perform this action.");
+  (error as Error & { status?: number }).status = 403;
+  throw error;
+}

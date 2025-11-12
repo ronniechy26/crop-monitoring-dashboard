@@ -4,7 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, ChevronLeft, ChevronRight, FolderOpen, LayoutGrid, Menu, Search, Settings, Users } from "lucide-react";
+import {
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  FolderOpen,
+  LayoutGrid,
+  Menu,
+  Search,
+  Settings,
+  Users,
+  ScrollText,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +24,7 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { label: "Dashboard", href: "/admin", icon: LayoutGrid },
   { label: "Data Pipeline", href: "/admin/pipeline", icon: FolderOpen },
+  { label: "Logs", href: "/admin/logs", icon: ScrollText },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ] as const;

@@ -7,6 +7,20 @@ CREATE TABLE "crop_geometries" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "crop_ingestion_logs" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"user_email" text,
+	"user_name" text,
+	"file_name" text,
+	"capture_date" date NOT NULL,
+	"total_features" integer NOT NULL,
+	"inserted_features" integer NOT NULL,
+	"skipped_features" integer NOT NULL,
+	"crops" text[] NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,

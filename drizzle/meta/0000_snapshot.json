@@ -1,5 +1,5 @@
 {
-  "id": "f65c7975-38b8-4c9a-9999-7f728ebe12fc",
+  "id": "13335d5c-da0c-4724-b85d-89882643a17f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -41,6 +41,86 @@
         },
         "updated_at": {
           "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crop_ingestion_logs": {
+      "name": "crop_ingestion_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_email": {
+          "name": "user_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "capture_date": {
+          "name": "capture_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_features": {
+          "name": "total_features",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inserted_features": {
+          "name": "inserted_features",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "skipped_features": {
+          "name": "skipped_features",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "crops": {
+          "name": "crops",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,

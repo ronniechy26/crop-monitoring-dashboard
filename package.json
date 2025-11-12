@@ -9,7 +9,9 @@
     "lint": "eslint",
     "auth:generate": "better-auth generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -29,6 +31,7 @@
     "react-dom": "19.2.0",
     "react-leaflet": "^5.0.0",
     "recharts": "^2.12.7",
+    "shpjs": "^6.2.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -39,6 +42,7 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/shpjs": "^3.4.7",
     "drizzle-kit": "^0.31.6",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",

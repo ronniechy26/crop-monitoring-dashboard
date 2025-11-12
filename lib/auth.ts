@@ -88,7 +88,7 @@ async function ensureDefaultAdminAccount() {
     });
     await db
       .update(authSchema.user)
-      .set({ emailVerified: true })
+      .set({ emailVerified: true, role: "admin" })
       .where(eq(authSchema.user.email, email));
   } catch (error) {
     console.error("Failed to ensure default admin account", error);
