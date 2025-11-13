@@ -5,7 +5,13 @@ import { LogsSkeleton } from "@/components/admin/logs-skeleton";
 
 export const dynamic = "force-dynamic";
 
-export default function LogsPage() {
+interface LogsPageProps {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function LogsPage({ searchParams }: LogsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
   return (
     <div className="space-y-6">
       <div>
@@ -16,7 +22,7 @@ export default function LogsPage() {
         </p>
       </div>
       <Suspense fallback={<LogsSkeleton />}>
-        <LogsContent />
+        <LogsContent searchParams={resolvedSearchParams} />
       </Suspense>
     </div>
   );

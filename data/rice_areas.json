@@ -1,0 +1,99 @@
+{
+  "type": "FeatureCollection",
+  "name": "Rice Paddies",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "rice-1",
+      "properties": {
+        "name": "Irrigated Terrace",
+        "yield_t_per_ha": 6.1,
+        "area_ha": 98,
+        "soil_moisture": 0.72,
+        "ndvi": 0.78,
+        "barangay": "Maligaya",
+        "monthly_production": {
+          "2024-03": 540,
+          "2024-04": 565,
+          "2024-05": 590,
+          "2024-06": 615,
+          "2024-07": 630
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [121.2, 16.85],
+            [121.35, 16.85],
+            [121.35, 16.7],
+            [121.2, 16.7],
+            [121.2, 16.85]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "rice-2",
+      "properties": {
+        "name": "Floodplain Classic",
+        "yield_t_per_ha": 5.6,
+        "area_ha": 112,
+        "soil_moisture": 0.69,
+        "ndvi": 0.74,
+        "barangay": "San Isidro",
+        "monthly_production": {
+          "2024-03": 510,
+          "2024-04": 535,
+          "2024-05": 560,
+          "2024-06": 585,
+          "2024-07": 600
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [121.4, 16.65],
+            [121.55, 16.65],
+            [121.55, 16.5],
+            [121.4, 16.5],
+            [121.4, 16.65]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "rice-3",
+      "properties": {
+        "name": "Delta Ribbon",
+        "yield_t_per_ha": 5.9,
+        "area_ha": 86,
+        "soil_moisture": 0.71,
+        "ndvi": 0.77,
+        "barangay": "Santa Rosa",
+        "monthly_production": {
+          "2024-03": 480,
+          "2024-04": 505,
+          "2024-05": 530,
+          "2024-06": 555,
+          "2024-07": 570
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [121.0, 16.55],
+            [121.15, 16.55],
+            [121.15, 16.4],
+            [121.0, 16.4],
+            [121.0, 16.55]
+          ]
+        ]
+      }
+    }
+  ]
+}

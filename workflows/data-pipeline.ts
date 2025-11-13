@@ -42,6 +42,7 @@ async function ingestFeatures(
 
   const { featureCollection, captureDateIso, datasetName, user } = payload;
   const captureDate = new Date(captureDateIso);
+  const captureDateSql = captureDate.toISOString().slice(0, 10);
 
   if (Number.isNaN(captureDate.getTime())) {
     throw new FatalError("Invalid capture date provided to the workflow.");
@@ -91,7 +92,7 @@ async function ingestFeatures(
             ),
             4326
           )::geometry(MultiPolygon, 4326),
-          ${captureDate}
+          ${captureDateSql}
         )
       `);
 
@@ -120,7 +121,7 @@ async function ingestFeatures(
         userEmail: user.email ?? null,
         userName: user.name ?? null,
         fileName: datasetName,
-        captureDate,
+        captureDate: captureDateSql,
         totalFeatures: featureCollection.features.length,
         insertedFeatures: insertedCount,
         skippedFeatures: skippedCount,

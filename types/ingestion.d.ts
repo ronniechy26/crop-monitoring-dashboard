@@ -81,3 +81,10 @@ export interface IngestionLogEntry {
   crops: string[];
   createdAt: string;
 }
+
+export interface IngestionLogsQueryResult {
+  logs: IngestionLogEntry[];
+  total: number;
+  page: number;
+  perPage: number;
+}

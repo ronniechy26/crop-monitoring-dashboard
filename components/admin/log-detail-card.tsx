@@ -54,7 +54,7 @@ export function LogDetailCard({ log }: LogDetailCardProps) {
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {log.crops.length > 0 ? (
                   log.crops.map((crop) => (
-                    <Badge key={crop} variant="secondary" className="text-xs capitalize">
+                    <Badge key={crop} variant="outline" className="text-xs capitalize">
                       {crop}
                     </Badge>
                   ))

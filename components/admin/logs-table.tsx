@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { FileText, Info } from "lucide-react";
 
@@ -9,9 +10,10 @@ import type { IngestionLogEntry } from "@/types/ingestion";
 
 interface LogsTableProps {
   logs: IngestionLogEntry[];
+  footer?: ReactNode;
 }
 
-export function LogsTable({ logs }: LogsTableProps) {
+export function LogsTable({ logs, footer }: LogsTableProps) {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -73,7 +75,7 @@ export function LogsTable({ logs }: LogsTableProps) {
                       return (
                         <Badge
                           key={`${log.id}-${crop}`}
-                          variant="secondary"
+                          variant="accent"
                           className={`text-xs capitalize ${getCropBadgeClass(definition?.slug)}`}
                         >
                           {definition?.label ?? "Unknown crop"}
@@ -103,6 +105,9 @@ export function LogsTable({ logs }: LogsTableProps) {
           </TableBody>
         </Table>
       </CardContent>
+      {footer ? (
+        <div className="border-t border-border/60 px-6 py-4">{footer}</div>
+      ) : null}
     </Card>
   );
 }
