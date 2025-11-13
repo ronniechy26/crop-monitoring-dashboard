@@ -4,6 +4,7 @@ import { FileText, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getCropDefinitionById, getCropDefinitionBySlug } from "@/lib/crops";
 import type { IngestionLogEntry } from "@/types/ingestion";
 
 interface LogsTableProps {
@@ -67,11 +68,18 @@ export function LogsTable({ logs }: LogsTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {log.crops.map((crop) => (
-                      <Badge key={`${log.id}-${crop}`} variant="secondary" className="text-xs capitalize">
-                        {crop}
-                      </Badge>
-                    ))}
+                    {log.crops.map((crop) => {
+                      const definition = resolveCropDefinition(crop);
+                      return (
+                        <Badge
+                          key={`${log.id}-${crop}`}
+                          variant="secondary"
+                          className={`text-xs capitalize ${getCropBadgeClass(definition?.slug)}`}
+                        >
+                          {definition?.label ?? "Unknown crop"}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
@@ -97,6 +105,36 @@ export function LogsTable({ logs }: LogsTableProps) {
       </CardContent>
     </Card>
   );
+}
+
+function resolveCropDefinition(value: string | number | undefined | null) {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const normalized = typeof value === "number" ? String(value) : value.trim();
+  const numericId = Number.parseInt(normalized, 10);
+  if (Number.isFinite(numericId)) {
+    const definitionById = getCropDefinitionById(numericId);
+    if (definitionById) {
+      return definitionById;
+    }
+  }
+
+  return getCropDefinitionBySlug(normalized.toLowerCase());
+}
+
+function getCropBadgeClass(slug: string | undefined) {
+  switch (slug) {
+    case "corn":
+      return "bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100";
+    case "onion":
+      return "bg-purple-100 text-purple-900 dark:bg-purple-500/20 dark:text-purple-100";
+    case "rice":
+      return "bg-green-100 text-green-900 dark:bg-green-500/20 dark:text-green-100";
+    default:
+      return "";
+  }
 }
 
 function formatDateTime(value: string) {

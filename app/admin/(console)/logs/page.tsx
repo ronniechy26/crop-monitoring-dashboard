@@ -1,10 +1,11 @@
-import { listIngestionLogs } from "@/action/query/logs";
-import { LogsTable } from "@/components/admin/logs-table";
+import { Suspense } from "react";
+
+import { LogsContent } from "@/components/admin/logs-content";
+import { LogsSkeleton } from "@/components/admin/logs-skeleton";
 
 export const dynamic = "force-dynamic";
 
-export default async function LogsPage() {
-  const logs = await listIngestionLogs();
+export default function LogsPage() {
   return (
     <div className="space-y-6">
       <div>
@@ -14,7 +15,9 @@ export default async function LogsPage() {
           Review when operators uploaded shapefiles, how many features were inserted, and which crops were included.
         </p>
       </div>
-      <LogsTable logs={logs} />
+      <Suspense fallback={<LogsSkeleton />}>
+        <LogsContent />
+      </Suspense>
     </div>
   );
 }

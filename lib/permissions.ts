@@ -69,7 +69,16 @@ export function hasPermission<R extends Resource>(
     if (!role) {
       return false;
     }
-    return role.authorize({ [resource]: [action] }).success;
+    const statements = role.statements as Partial<
+      Record<Resource, readonly ActionFor<Resource>[]>
+    >;
+    const allowedActions = statements[resource] as
+      | readonly ActionFor<R>[]
+      | undefined;
+    if (!allowedActions) {
+      return false;
+    }
+    return allowedActions.includes(action);
   });
 }
 

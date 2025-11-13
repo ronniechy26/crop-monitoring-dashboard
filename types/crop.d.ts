@@ -1,4 +1,11 @@
-export type CropSlug = "corn" | "onion";
+export type CropSlug = "corn" | "onion" | "rice";
+export type CropId = 1 | 2 | 3;
+
+export interface CropDefinition {
+  id: CropId;
+  slug: CropSlug;
+  label: string;
+}
 
 export interface CropFeatureProperties {
   name: string;
