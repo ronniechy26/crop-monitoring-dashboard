@@ -1,10 +1,14 @@
 "use client";
 
 import { CloudUpload, XCircle } from "lucide-react";
-import { useActionState, useRef, useState, type ChangeEvent } from "react";
+import { useActionState, useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import { Button } from "@/components/ui/button";
-import type { IngestionUploadState, UploadShapefileAction } from "@/types/ingestion";
+import type {
+  DataPipelineProgressEvent,
+  IngestionUploadState,
+  UploadShapefileAction,
+} from "@/types/ingestion";
 
 const initialState: IngestionUploadState = {
   status: "idle",
@@ -21,6 +25,8 @@ type ShapefileUploadFormProps = {
 export function ShapefileUploadForm({ action, maxUploadMb }: ShapefileUploadFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const [fileName, setFileName] = useState("");
+  const [progressEvents, setProgressEvents] = useState<DataPipelineProgressEvent[]>([]);
+  const [streamError, setStreamError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -34,6 +40,69 @@ export function ShapefileUploadForm({ action, maxUploadMb }: ShapefileUploadForm
       fileInputRef.current.value = "";
     }
   }
+
+  useEffect(() => {
+    const runId = state.workflowRunId?.trim();
+    if (!runId) {
+      setProgressEvents([]);
+      setStreamError(null);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+
+    setProgressEvents([]);
+    setStreamError(null);
+
+    async function readStream(runIdParam: string) {
+      try {
+        const response = await fetch(`/api/workflows/${runIdParam}/stream`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (!response.ok || !response.body) {
+          throw new Error("Unable to open workflow progress stream.");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) {
+              continue;
+            }
+            try {
+              const event = JSON.parse(trimmed) as DataPipelineProgressEvent;
+              setProgressEvents([event]);
+            } catch {
+              continue;
+            }
+          }
+        }
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          return;
+        }
+        setStreamError(
+          error instanceof Error ? error.message : "Failed to read workflow progress."
+        );
+      }
+    }
+
+    readStream(runId);
+
+    return () => {
+      controller.abort();
+    };
+  }, [state.workflowRunId]);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -91,8 +160,48 @@ export function ShapefileUploadForm({ action, maxUploadMb }: ShapefileUploadForm
       <SubmitButton pending={isPending} />
 
       {state.status === "success" && (
-        <div className="rounded-lg border border-emerald-400/50 bg-emerald-50/70 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-500/60 dark:bg-emerald-500/10 dark:text-emerald-200">
-          {state.message}
+        <div className="space-y-2 rounded-lg border border-emerald-400/50 bg-emerald-50/70 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-500/60 dark:bg-emerald-500/10 dark:text-emerald-200">
+          <p>{state.message}</p>
+          {state.datasetName && (
+            <p className="text-xs text-emerald-900/80 dark:text-emerald-100/80">
+              Dataset: <span className="font-semibold">{state.datasetName}</span>
+            </p>
+          )}
+          {state.workflowRunId && (
+            <p className="text-xs text-emerald-900/80 dark:text-emerald-100/80">
+              Workflow run ID: <span className="font-mono text-xs">{state.workflowRunId}</span>
+            </p>
+          )}
+          {state.workflowRunId && (progressEvents.length > 0 || streamError) && (
+            <div className="rounded-md border border-emerald-500/40 bg-emerald-100/50 px-3 py-2 text-xs text-emerald-900 dark:border-emerald-400/50 dark:bg-emerald-500/20">
+              <p className="mb-1 font-semibold uppercase tracking-wide text-emerald-900/80 dark:text-emerald-50">
+                Workflow progress
+              </p>
+              {progressEvents.length === 0 ? (
+                <p className="text-emerald-900/80 dark:text-emerald-50">
+                  Listening for updates from the ingestion workflow…
+                </p>
+              ) : (
+                <ul className="space-y-1 text-emerald-900/80 dark:text-emerald-50">
+                  {progressEvents.map((event, index) => (
+                    <li key={`${event.status}-${index}`}>
+                      <span>
+                        {event.message}
+                        {typeof event.inserted === "number" && typeof event.totalFeatures === "number" && (
+                          <> ({event.inserted}/{event.totalFeatures})</>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {streamError && (
+                <p className="mt-2 text-[11px] font-medium text-red-900 dark:text-red-200">
+                  {streamError}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
       {state.status === "error" && (

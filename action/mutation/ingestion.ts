@@ -1,39 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { sql } from "drizzle-orm";
+import { start } from "workflow/api";
 
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { ingestionLogs } from "@/lib/db/schema";
 import { fileToFeatureCollection } from "@/lib/geodata";
-import type { IngestionUploadState } from "@/types/ingestion";
-import type { GeoJsonProperties } from "geojson";
-
-const DEFAULT_MAX_FEATURES = 20000;
-const parsedLimit = Number.parseInt(process.env.INGESTION_MAX_FEATURES ?? "", 10);
-const MAX_FEATURES = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : DEFAULT_MAX_FEATURES;
-const DN_KEYS = ["dn", "DN", "crop", "Crop", "CROP"] as const;
-
-function readDn(properties: GeoJsonProperties | null | undefined) {
-  if (!properties) {
-    return null;
-  }
-  for (const key of DN_KEYS) {
-    if (key in properties) {
-      const value = properties[key];
-      if (value === undefined || value === null) {
-        continue;
-      }
-      const normalized = value.toString().trim();
-      if (normalized.length > 0) {
-        return normalized.toLowerCase();
-      }
-    }
-  }
-  return null;
-}
+import { MAX_FEATURES } from "@/lib/ingestion-limits";
+import type { DataPipelineWorkflowInput, IngestionUploadState } from "@/types/ingestion";
+import { handleDataPipelineIngestion } from "@/workflows/data-pipeline";
 
 export async function uploadShapefileMutation(
   _prevState: IngestionUploadState,
@@ -73,62 +47,26 @@ export async function uploadShapefileMutation(
       );
     }
 
-    const dnSet = new Set<string>();
-    const datasetName = dataset.name;
+    const payload: DataPipelineWorkflowInput = {
+      captureDateIso: captureDate.toISOString(),
+      datasetName: dataset.name,
+      featureCollection: collection,
+      user: {
+        id: user.id,
+        email: user.email ?? null,
+        name: user.name ?? null,
+      },
+    };
 
-    const { inserted, skipped } = await db.transaction(async (tx) => {
-      let inserted = 0;
-      let skipped = 0;
-      for (const feature of collection.features) {
-        const dn = readDn(feature.properties);
-        if (!dn) {
-          skipped++;
-          continue;
-        }
-        dnSet.add(dn);
-        const geometryJson = JSON.stringify(feature.geometry);
-        await tx.execute(sql`
-          insert into crop_geometries (dn, geom, capture_date)
-          values (
-            ${dn},
-            ST_SetSRID(
-              ST_Multi(
-                ST_GeomFromGeoJSON(${geometryJson})
-              ),
-              4326
-            )::geometry(MultiPolygon, 4326),
-            ${captureDate}
-          )
-        `);
-        inserted++;
-      }
-      if (inserted === 0) {
-        throw new Error("No features contained a crop identifier (dn) property.");
-      }
-
-      await tx.insert(ingestionLogs).values({
-        userId: user.id,
-        userEmail: user.email ?? null,
-        userName: user.name ?? null,
-        fileName: datasetName,
-        captureDate,
-        totalFeatures: collection.features.length,
-        insertedFeatures: inserted,
-        skippedFeatures: skipped,
-        crops: Array.from(dnSet),
-      });
-
-      return { inserted, skipped };
-    });
-
-    revalidatePath("/admin");
-    revalidatePath("/admin/pipeline");
+    const run = await start(handleDataPipelineIngestion, [payload]);
 
     return {
       status: "success",
-      message: `Uploaded ${inserted} feature${inserted === 1 ? "" : "s"} (${skipped} skipped without dn).`,
-      inserted,
-      skipped,
+      message: `Ingestion workflow started for ${dataset.name}. Track run ${run.runId}.`,
+      inserted: 0,
+      skipped: 0,
+      workflowRunId: run.runId,
+      datasetName: dataset.name,
     };
   } catch (error) {
     const message =
