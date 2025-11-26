@@ -27,8 +27,8 @@ export default async function DataPipelinePage() {
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
             The uploader converts zipped shapefiles (or GeoJSON exports) into MultiPolygon geometries and writes them to
-            the `crop_geometries` table with the capture date while reading each feature&apos;s `dn`/`crop` attribute to
-            set the stored crop identifier.
+            the `crop_geometries` table with the capture date while capturing crop class, barangay/region codes and names,
+            area (sqm), and crop names alongside the geometry.
           </p>
           <ShapefileUploadForm action={uploadShapefileMutation} maxUploadMb={getUploadLimit()} />
         </CardContent>

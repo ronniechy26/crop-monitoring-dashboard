@@ -7,6 +7,7 @@ import type {
   MultiPolygon,
   Polygon,
 } from "geojson";
+import type { CropGeometryProperties, PipelineFeatureCollection } from "@/types/ingestion";
 
 type PolygonLike = Polygon | MultiPolygon;
 
@@ -47,13 +48,14 @@ function extractCollections(value: unknown): FeatureCollection[] {
   return [];
 }
 
-function flattenCollections(collections: FeatureCollection[]): FeatureCollection<PolygonLike> {
-  const features: Feature<PolygonLike, GeoJsonProperties>[] = [];
+function flattenCollections(collections: FeatureCollection[]): PipelineFeatureCollection {
+  const features: Feature<PolygonLike, CropGeometryProperties>[] = [];
   for (const collection of collections) {
     for (const feature of collection.features) {
       if (feature && isPolygonLike(feature.geometry)) {
         features.push({
           ...feature,
+          properties: (feature.properties ?? null) as CropGeometryProperties,
           geometry:
             feature.geometry.type === "Polygon"
               ? ({
@@ -75,7 +77,7 @@ function flattenCollections(collections: FeatureCollection[]): FeatureCollection
   };
 }
 
-async function parseShapefileZip(file: File) {
+async function parseShapefileZip(file: File): Promise<PipelineFeatureCollection> {
   const buffer = await file.arrayBuffer();
   const parsed = await shp(buffer);
   const collections = extractCollections(parsed);
@@ -85,7 +87,7 @@ async function parseShapefileZip(file: File) {
   return flattenCollections(collections);
 }
 
-function parseGeoJson(text: string) {
+function parseGeoJson(text: string): PipelineFeatureCollection {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -108,7 +110,7 @@ function assertFileSize(file: File) {
   }
 }
 
-export async function fileToFeatureCollection(file: File) {
+export async function fileToFeatureCollection(file: File): Promise<PipelineFeatureCollection> {
   assertFileSize(file);
   const name = file.name.toLowerCase();
   if (name.endsWith(".zip")) {

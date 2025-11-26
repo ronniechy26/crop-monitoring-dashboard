@@ -152,8 +152,8 @@ export function ShapefileUploadForm({ action, maxUploadMb }: ShapefileUploadForm
         )}
         <p className="text-xs text-muted-foreground">
           Upload zipped shapefile bundles (SHP/DBF/SHX) or GeoJSON exports{" "}
-          {maxUploadMb ? `up to ${maxUploadMb} MB` : "within the configured size limit"}. Each feature must have a `dn` or
-          `crop` property indicating the crop.
+          {maxUploadMb ? `up to ${maxUploadMb} MB` : "within the configured size limit"}. Each feature must include a
+          `class` (or legacy `dn`/`crop`) property indicating the crop along with barangay codes, names, and area data.
         </p>
       </div>
 

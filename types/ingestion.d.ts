@@ -31,9 +31,42 @@ export interface PipelineUserContext {
   name?: string | null;
 }
 
+export interface CropGeometryProperties extends GeoJsonProperties {
+  class?: number | string | null;
+  FID_1?: number | string | null;
+  PHCode_Bgy?: string | null;
+  PHCode_Reg?: string | null;
+  Reg_Name?: string | null;
+  PHCode_Pro?: string | null;
+  Pro_Name?: string | null;
+  PHCode_Mun?: string | null;
+  Mun_Name?: string | null;
+  Bgy_Name?: string | null;
+  "Area sqm"?: number | string | null;
+  Area_sqm?: number | string | null;
+  CropName?: string | null;
+  crop?: string | null;
+  dn?: string | null;
+}
+
+export interface CropGeometryAttributes {
+  classValue: number | null;
+  fid1: number | null;
+  phCodeBgy: string | null;
+  phCodeReg: string | null;
+  regName: string | null;
+  phCodePro: string | null;
+  proName: string | null;
+  phCodeMun: string | null;
+  munName: string | null;
+  bgyName: string | null;
+  areaSqm: number | null;
+  cropName: string | null;
+}
+
 export type PipelineFeatureCollection = FeatureCollection<
   Polygon | MultiPolygon,
-  GeoJsonProperties
+  CropGeometryProperties
 >;
 
 export interface DataPipelineWorkflowInput {

@@ -20,6 +20,78 @@
           "primaryKey": false,
           "notNull": true
         },
+        "class": {
+          "name": "class",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fid_1": {
+          "name": "fid_1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ph_code_bgy": {
+          "name": "ph_code_bgy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ph_code_reg": {
+          "name": "ph_code_reg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reg_name": {
+          "name": "reg_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ph_code_pro": {
+          "name": "ph_code_pro",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pro_name": {
+          "name": "pro_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ph_code_mun": {
+          "name": "ph_code_mun",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mun_name": {
+          "name": "mun_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bgy_name": {
+          "name": "bgy_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area_sqm": {
+          "name": "area_sqm",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crop_name": {
+          "name": "crop_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "geom": {
           "name": "geom",
           "type": "geometry(MultiPolygon, 4326)",

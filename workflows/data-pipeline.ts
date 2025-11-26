@@ -7,13 +7,16 @@ import { ingestionLogs } from "@/lib/db/schema";
 import { MAX_FEATURES } from "@/lib/ingestion-limits";
 import { DATA_PIPELINE_PROGRESS_NAMESPACE } from "@/lib/workflow-streams";
 import type {
+  CropGeometryAttributes,
+  CropGeometryProperties,
   DataPipelineProgressEvent,
   DataPipelineWorkflowInput,
   DataPipelineWorkflowResult,
 } from "@/types/ingestion";
 import type { GeoJsonProperties } from "geojson";
 
-const DN_KEYS = ["dn", "DN", "crop", "Crop", "CROP"] as const;
+const DN_KEYS = ["class", "Class", "dn", "DN", "crop", "Crop", "CROP"] as const;
+const AREA_KEYS = ["Area sqm", "Area_sqm", "AreaSqm", "area_sqm"] as const;
 const PROGRESS_INTERVAL = 100;
 
 export async function handleDataPipelineIngestion(
@@ -73,7 +76,8 @@ async function ingestFeatures(
     let lastAnnouncement = 0;
 
     for (const feature of featureCollection.features) {
-      const dn = readDn(feature.properties);
+      const attributes = readAttributes(feature.properties);
+      const dn = readDn(feature.properties, attributes);
       if (!dn || !feature.geometry) {
         skippedCount++;
         continue;
@@ -83,9 +87,37 @@ async function ingestFeatures(
       const geometryJson = JSON.stringify(feature.geometry);
 
       await tx.execute(sql`
-        insert into crop_geometries (dn, geom, capture_date)
+        insert into crop_geometries (
+          dn,
+          class,
+          fid_1,
+          ph_code_bgy,
+          ph_code_reg,
+          reg_name,
+          ph_code_pro,
+          pro_name,
+          ph_code_mun,
+          mun_name,
+          bgy_name,
+          area_sqm,
+          crop_name,
+          geom,
+          capture_date
+        )
         values (
           ${dn},
+          ${attributes.classValue},
+          ${attributes.fid1},
+          ${attributes.phCodeBgy},
+          ${attributes.phCodeReg},
+          ${attributes.regName},
+          ${attributes.phCodePro},
+          ${attributes.proName},
+          ${attributes.phCodeMun},
+          ${attributes.munName},
+          ${attributes.bgyName},
+          ${attributes.areaSqm},
+          ${attributes.cropName},
           ST_SetSRID(
             ST_Multi(
               ST_GeomFromGeoJSON(${geometryJson})
@@ -214,26 +246,104 @@ async function refreshDashboards() {
   revalidatePath("/admin/pipeline");
 }
 
-function readDn(properties: GeoJsonProperties | null | undefined) {
+function readDn(
+  properties: GeoJsonProperties | null | undefined,
+  attributes: CropGeometryAttributes
+) {
+  if (attributes.classValue !== null) {
+    return attributes.classValue.toString();
+  }
+
+  const dnValue = getProperty(properties, DN_KEYS);
+  const normalized = normalizeIdentifier(dnValue ?? attributes.cropName);
+  return normalized;
+}
+
+function readAttributes(
+  properties: CropGeometryProperties | null | undefined
+): CropGeometryAttributes {
+  const classValue = toNumber(getProperty(properties, ["class", "Class", "CLASS", "dn", "DN"]));
+  const fid1 = toNumber(getProperty(properties, ["FID_1", "fid_1", "FID"]));
+  const phCodeBgy = toStringValue(getProperty(properties, ["PHCode_Bgy", "phcode_bgy"]));
+  const phCodeReg = toStringValue(getProperty(properties, ["PHCode_Reg", "phcode_reg"]));
+  const regName = toStringValue(getProperty(properties, ["Reg_Name", "reg_name"]));
+  const phCodePro = toStringValue(getProperty(properties, ["PHCode_Pro", "phcode_pro"]));
+  const proName = toStringValue(getProperty(properties, ["Pro_Name", "pro_name"]));
+  const phCodeMun = toStringValue(getProperty(properties, ["PHCode_Mun", "phcode_mun"]));
+  const munName = toStringValue(getProperty(properties, ["Mun_Name", "mun_name"]));
+  const bgyName = toStringValue(getProperty(properties, ["Bgy_Name", "bgy_name"]));
+  const areaSqm = toNumber(getProperty(properties, AREA_KEYS));
+  const cropName = toStringValue(getProperty(properties, ["CropName", "cropName", "Crop", "crop"]));
+
+  return {
+    classValue,
+    fid1,
+    phCodeBgy,
+    phCodeReg,
+    regName,
+    phCodePro,
+    proName,
+    phCodeMun,
+    munName,
+    bgyName,
+    areaSqm,
+    cropName,
+  };
+}
+
+function getProperty(
+  properties: GeoJsonProperties | null | undefined,
+  keys: readonly string[]
+): unknown {
   if (!properties) {
     return null;
   }
-
-  for (const key of DN_KEYS) {
+  for (const key of keys) {
     if (key in properties) {
-      const value = properties[key];
-      if (value === undefined || value === null) {
-        continue;
-      }
-
-      const normalized = value.toString().trim();
-      if (normalized.length > 0) {
-        return normalized.toLowerCase();
-      }
+      return properties[key];
     }
   }
-
   return null;
+}
+
+function toNumber(value: unknown): number | null {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "string") {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function toStringValue(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value.toString() : null;
+  }
+  return null;
+}
+
+function normalizeIdentifier(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value.toString() : null;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed.toLowerCase() : null;
+  }
+  const stringified = value.toString().trim();
+  return stringified.length > 0 ? stringified.toLowerCase() : null;
 }
 
 function shouldAnnounce(inserted: number, lastAnnouncement: number) {
