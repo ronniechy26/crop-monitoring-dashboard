@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import type { LatLngBoundsExpression } from "leaflet";
 import type { FeatureCollection } from "geojson";
 import "leaflet/dist/leaflet.css";
-import type { CropFeature, CropFeatureProperties } from "@/lib/crop-data";
+import type { CropFeature, CropFeatureProperties } from "@/types/crop";
 
 export interface LeafletChoroplethProps {
   features: CropFeature[];

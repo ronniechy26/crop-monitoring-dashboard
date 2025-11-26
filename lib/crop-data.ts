@@ -2,82 +2,31 @@ import { cache } from "react";
 
 import cornData from "@/data/corn_areas.json";
 import onionData from "@/data/onion_areas.json";
+import riceData from "@/data/rice_areas.json";
+import type {
+  CropFeature,
+  CropFeatureProperties,
+  CropGeoJson,
+  CropMetrics,
+  CropSlug,
+  CropSummary,
+  TimeseriesPoint,
+} from "@/types/crop";
 
-export type CropSlug = "corn" | "onion";
-
-export interface CropFeatureProperties {
-  name: string;
-  yield_t_per_ha: number;
-  area_ha: number;
-  soil_moisture: number;
-  ndvi: number;
-  barangay: string;
-  monthly_production: Record<string, number>;
-}
-
-export interface CropFeature {
-  type: "Feature";
-  id: string;
-  properties: CropFeatureProperties;
-  geometry: {
-    type: "Polygon";
-    coordinates: number[][][];
-  };
-}
-
-export interface CropGeoJson {
-  type: "FeatureCollection";
-  name: string;
-  features: CropFeature[];
-}
-
-export interface CropSummary {
-  crop: CropSlug;
-  avgYield: number;
-  avgNdvi: number;
-  avgMoisture: number;
-  totalArea: number;
-}
-
-export interface TimeseriesPoint {
-  date: string;
-  yield: number;
-  soilMoisture: number;
-  ndvi: number;
-  rainfall: number;
-}
-
-export interface CropMetrics {
-  summary: CropSummary;
-  trend: {
-    weeklyChange: number;
-    alert: string;
-    confidence: number;
-  };
-  timeSeries: TimeseriesPoint[];
-  table: Array<{
-    id: string;
-    name: string;
-    barangay: string;
-    area: number;
-    yield: number;
-    moisture: number;
-    ndvi: number;
-  }>;
-  features: CropFeature[];
-  timelineMonths: string[];
-  barangayProduction: Array<{
-    barangay: string;
-    totalArea: number;
-    latestProduction: number;
-    averageYield: number;
-    monthly: Record<string, number>;
-  }>;
-}
+export type {
+  CropFeature,
+  CropFeatureProperties,
+  CropGeoJson,
+  CropMetrics,
+  CropSlug,
+  CropSummary,
+  TimeseriesPoint,
+} from "@/types/crop";
 
 const cropDataMap: Record<CropSlug, CropGeoJson> = {
   corn: cornData as CropGeoJson,
   onion: onionData as CropGeoJson,
+  rice: riceData as CropGeoJson,
 };
 
 const mockTrends: Record<CropSlug, CropMetrics["trend"]> = {
@@ -90,6 +39,11 @@ const mockTrends: Record<CropSlug, CropMetrics["trend"]> = {
     weeklyChange: -1.2,
     alert: "Bulbing phase stable; watch fungal pressure post-rain",
     confidence: 0.68,
+  },
+  rice: {
+    weeklyChange: 1.1,
+    alert: "Irrigation cadence steady; monitor lodging after typhoon gusts",
+    confidence: 0.7,
   },
 };
 
@@ -109,6 +63,14 @@ const mockTimeSeries: Record<CropSlug, TimeseriesPoint[]> = {
     { date: "2024-06-15", yield: 3.7, soilMoisture: 0.55, ndvi: 0.63, rainfall: 7 },
     { date: "2024-07-01", yield: 3.9, soilMoisture: 0.57, ndvi: 0.65, rainfall: 4 },
     { date: "2024-07-15", yield: 4.2, soilMoisture: 0.58, ndvi: 0.66, rainfall: 3 },
+  ],
+  rice: [
+    { date: "2024-05-01", yield: 4.8, soilMoisture: 0.68, ndvi: 0.73, rainfall: 10 },
+    { date: "2024-05-15", yield: 5.1, soilMoisture: 0.69, ndvi: 0.74, rainfall: 14 },
+    { date: "2024-06-01", yield: 5.3, soilMoisture: 0.71, ndvi: 0.76, rainfall: 18 },
+    { date: "2024-06-15", yield: 5.6, soilMoisture: 0.73, ndvi: 0.78, rainfall: 12 },
+    { date: "2024-07-01", yield: 5.8, soilMoisture: 0.72, ndvi: 0.77, rainfall: 8 },
+    { date: "2024-07-15", yield: 6.0, soilMoisture: 0.7, ndvi: 0.75, rainfall: 6 },
   ],
 };
 
@@ -225,10 +187,11 @@ export const getCropMetrics = cache(async (crop: CropSlug): Promise<CropMetrics>
 });
 
 export async function getAllCropSummaries() {
-  const [corn, onion] = await Promise.all([
+  const [corn, onion, rice] = await Promise.all([
     getCropMetrics("corn"),
     getCropMetrics("onion"),
+    getCropMetrics("rice"),
   ]);
 
-  return [corn.summary, onion.summary];
+  return [corn.summary, onion.summary, rice.summary];
 }

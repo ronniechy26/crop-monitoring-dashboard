@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CropMetrics, CropSlug } from "@/lib/crop-data";
+import type { CropMetrics, CropSlug } from "@/types/crop";
 import { formatMonthLabel } from "@/lib/format";
 
 import { CropDataTable } from "./crop-data-table";

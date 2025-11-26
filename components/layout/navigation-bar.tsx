@@ -21,7 +21,7 @@ export function NavigationBar() {
               <Button
                 key={nav.href}
                 asChild
-                variant={isActive ? "accent" : "ghost"}
+                variant={isActive ? "default" : "ghost"}
                 size="sm"
                 className={cn(
                   "rounded-full text-sm sm:text-xs",

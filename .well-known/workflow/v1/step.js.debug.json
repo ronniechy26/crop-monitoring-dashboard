@@ -1,0 +1,6 @@
+{
+  "stepFiles": [
+    "/Users/rnnchy/Repo/dashboard/crop-monitoring-dashboard/workflows/data-pipeline.ts",
+    "/Users/rnnchy/Repo/dashboard/crop-monitoring-dashboard/node_modules/workflow/dist/stdlib.js"
+  ]
+}

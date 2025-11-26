@@ -5,7 +5,7 @@ import { Gauge, Waves, Activity, Leaf } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { CropMetrics } from "@/lib/crop-data";
+import type { CropMetrics } from "@/types/crop";
 
 interface KPIGridProps {
   metrics: CropMetrics;

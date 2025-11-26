@@ -32,7 +32,7 @@ export function CropFilters({ stages, sensors }: CropFiltersProps) {
               className="inline-flex"
             >
               <Button
-                variant={stage === item ? "accent" : "outline"}
+                variant={stage === item ? "default" : "outline"}
                 size="sm"
                 className="rounded-full text-xs"
                 onClick={() => setStage(item)}
@@ -50,7 +50,7 @@ export function CropFilters({ stages, sensors }: CropFiltersProps) {
               className="inline-flex"
             >
               <Button
-                variant={sensor === item ? "accent" : "ghost"}
+                variant={sensor === item ? "default" : "ghost"}
                 size="sm"
                 className="rounded-full text-xs"
                 onClick={() => setSensor(item)}

@@ -1,11 +1,12 @@
-import { LandingDashboard } from "@/components/dashboard/landing-dashboard";
-import { getCropMetrics } from "@/lib/crop-data";
+import { Suspense } from "react";
 
-export default async function Home() {
-  const [corn, onion] = await Promise.all([
-    getCropMetrics("corn"),
-    getCropMetrics("onion"),
-  ]);
+import { LandingDashboardContent } from "@/components/dashboard/landing-dashboard-content";
+import { LandingDashboardSkeleton } from "@/components/dashboard/landing-dashboard-skeleton";
 
-  return <LandingDashboard corn={corn} onion={onion} />;
+export default function Home() {
+  return (
+    <Suspense fallback={<LandingDashboardSkeleton />}>
+      <LandingDashboardContent />
+    </Suspense>
+  );
 }

@@ -12,12 +12,14 @@ interface ThemeControlsProps {
   className?: string;
   variant?: "horizontal" | "stacked";
   showNavigationPlacement?: boolean;
+  showPalette?: boolean;
 }
 
 export function ThemeControls({
   className,
   variant = "horizontal",
   showNavigationPlacement = false,
+  showPalette = true,
 }: ThemeControlsProps) {
   const {
     mode,
@@ -53,7 +55,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={resolvedMode === "light" && mode !== "system" ? "accent" : "ghost"}
+          variant={resolvedMode === "light" && mode !== "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Activate light mode"
           onClick={() => setMode("light")}
@@ -63,7 +65,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={mode === "system" ? "accent" : "ghost"}
+          variant={mode === "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Follow system appearance"
           onClick={() => setMode("system")}
@@ -73,7 +75,7 @@ export function ThemeControls({
         <Button
           type="button"
           size="icon"
-          variant={resolvedMode === "dark" && mode !== "system" ? "accent" : "ghost"}
+          variant={resolvedMode === "dark" && mode !== "system" ? "default" : "ghost"}
           className="h-8 w-8 rounded-full"
           aria-label="Activate dark mode"
           onClick={() => setMode("dark")}
@@ -81,27 +83,29 @@ export function ThemeControls({
           <Moon className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex items-center gap-2">
-        <label
-          htmlFor="theme-palette"
-          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80"
-        >
-          Theme
-        </label>
-        <select
-          id="theme-palette"
-          value={palette}
-          onChange={handlePaletteChange}
-          className="h-9 rounded-full border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
-          aria-label="Select visual theme"
-        >
-          {themePalettes.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {showPalette ? (
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="theme-palette"
+            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80"
+          >
+            Theme
+          </label>
+          <select
+            id="theme-palette"
+            value={palette}
+            onChange={handlePaletteChange}
+            className="h-9 rounded-full border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+            aria-label="Select visual theme"
+          >
+            {themePalettes.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
       {showNavigationPlacement ? (
         <div
           className={cn(
@@ -121,7 +125,7 @@ export function ThemeControls({
             <Button
               type="button"
               size="sm"
-              variant={sidebarPosition === "sidebar" ? "accent" : "outline"}
+              variant={sidebarPosition === "sidebar" ? "default" : "outline"}
               className={cn(
                 "rounded-full text-xs",
                 sidebarPosition === "sidebar" && "shadow-sm",
@@ -134,7 +138,7 @@ export function ThemeControls({
             <Button
               type="button"
               size="sm"
-              variant={sidebarPosition === "navbar" ? "accent" : "outline"}
+              variant={sidebarPosition === "navbar" ? "default" : "outline"}
               className={cn(
                 "rounded-full text-xs",
                 sidebarPosition === "navbar" && "shadow-sm",
